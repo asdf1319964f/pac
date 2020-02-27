@@ -1,0 +1,42 @@
+= 中央电视台 =
+CCTV1HD_H265,https://tv.elibei.com/tv/play?token=38d6202c351e3308ed7d892ff5ee26c1&k=7bdce41fc240ca01284698295ade9180&cid=208&uid=57444
+CCTV2HD_H265,https://tv.elibei.com/tv/play?token=65d3d604331aff9db6eac1e909d9d7f3&k=7bdce41fc240ca01284698295ade9180&cid=209&uid=57444
+CCTV3HD_H265,https://tv.elibei.com/tv/play?token=8ed81d4c0046a14f4087689a366e2c50&k=7bdce41fc240ca01284698295ade9180&cid=210&uid=57444
+CCTV5HD_H265,https://tv.elibei.com/tv/play?token=b5c54be8b5f98538b2155dec507ea54c&k=7bdce41fc240ca01284698295ade9180&cid=213&uid=57444
+CCTV6HD_H265,https://tv.elibei.com/tv/play?token=b31b83540603b773a44b27d0d502244e&k=7bdce41fc240ca01284698295ade9180&cid=214&uid=57444
+CCTV7HD_H265,https://tv.elibei.com/tv/play?token=6d54c8cf0a8eb2d2b65a9e8b02743140&k=7bdce41fc240ca01284698295ade9180&cid=215&uid=57444
+CCTV8HD_H265,https://tv.elibei.com/tv/play?token=d4a1112bd6d9a1d9e7fd024d91206403&k=7bdce41fc240ca01284698295ade9180&cid=216&uid=57444
+超高清 4K,https://tv.elibei.com/tv/play?token=eb87bda3e0a517de8054900227312aba&k=7bdce41fc240ca01284698295ade9180&cid=183171&uid=57444
+CCTV10HD_H265,https://tv.elibei.com/tv/play?token=7a2e8929e53b4a946625472192894f14&k=7bdce41fc240ca01284698295ade9180&cid=218&uid=57444
+CCTV11HD_H265,https://tv.elibei.com/tv/play?token=c75fbcdabd1b6bdb7a4ca83ca19176de&k=7bdce41fc240ca01284698295ade9180&cid=219&uid=57444
+CCTV12HD_H265,https://tv.elibei.com/tv/play?token=c55e78719ac64423b5b40454c1212121&k=7bdce41fc240ca01284698295ade9180&cid=220&uid=57444
+CCTV13HD_H265,https://tv.elibei.com/tv/play?token=358137b8c0aa176abbad25b5a5101c19&k=7bdce41fc240ca01284698295ade9180&cid=221&uid=57444
+CCTV14HD_H265,https://tv.elibei.com/tv/play?token=9e57a9dc2fe18ea94a2ad2f556a750c7&k=7bdce41fc240ca01284698295ade9180&cid=222&uid=57444
+CCTV风云音乐,https://tv.elibei.com/tv/play?token=d8159c193134347fa58fab2c61477458&k=7bdce41fc240ca01284698295ade9180&cid=182405&uid=57444
+CCTV老故事,https://tv.elibei.com/tv/play?token=eb76e4b9575ce771a4236e00326ec7cd&k=7bdce41fc240ca01284698295ade9180&cid=278&uid=57444
+TVB功夫片,https://tv.elibei.com/tv/play?token=615886b3a869e15571299092f30562a8&k=7bdce41fc240ca01284698295ade9180&cid=182&uid=57444
+TVB星河,https://tv.elibei.com/tv/play?token=bd2b9f17a10b9ba031a4069e2a6d4ed6&k=7bdce41fc240ca01284698295ade9180&cid=181&uid=57444
+TVB明珠,https://tv.elibei.com/tv/play?token=dc837b97a851910443a7682b24bd07f0&k=7bdce41fc240ca01284698295ade9180&cid=184&uid=57444
+TVB翡翠,https://tv.elibei.com/tv/play?token=b06a0910c5521f5b87dcc285cec7bb36&k=7bdce41fc240ca01284698295ade9180&cid=183&uid=57444
+TVB J2,https://tv.elibei.com/tv/play?token=89eb0332eb7d44c648b49456eaafad0d&k=7bdce41fc240ca01284698295ade9180&cid=178&uid=57444
+VIU-TV,https://tv.elibei.com/tv/play?token=8e8b7837a234878508ec31a229ed7479&k=7bdce41fc240ca01284698295ade9180&cid=195&uid=57444
+凤凰卫视,https://tv.elibei.com/tv/play?token=fa634c5d07cd4abbe2ee62ed28e21b46&k=7bdce41fc240ca01284698295ade9180&cid=192&uid=57444
+凤凰资讯,https://tv.elibei.com/tv/play?token=9cb8ee6f55271c092c794c02818c5cfa&k=7bdce41fc240ca01284698295ade9180&cid=193&uid=57444
+凤凰香港,https://tv.elibei.com/tv/play?token=5f2d0dd5e8289ace9260b50d266f738e&k=7bdce41fc240ca01284698295ade9180&cid=63202&uid=57444
+无线财经台,https://tv.elibei.com/tv/play?token=d8a4d774ff4bb0573186b258ae374045&k=7bdce41fc240ca01284698295ade9180&cid=174486&uid=57444
+中视,https://tv.elibei.com/tv/play?token=9f76549e0b40b0e8c5c95f77ede8159f&k=7bdce41fc240ca01284698295ade9180&cid=31&uid=57444
+东森新闻,https://tv.elibei.com/tv/play?token=9439ed25c9d7a7b6d1c6d23bc3d835ee&k=7bdce41fc240ca01284698295ade9180&cid=140&uid=57444
+东森电影,https://tv.elibei.com/tv/play?token=cd8564826136d8b599e370e2b7a730d1&k=7bdce41fc240ca01284698295ade9180&cid=138&uid=57444
+TVBS新闻,https://tv.elibei.com/tv/play?token=8d3a3e59c83f8833bd9f76a900dc01eb&k=7bdce41fc240ca01284698295ade9180&cid=67808&uid=57444
+中天综合,https://tv.elibei.com/tv/play?token=6575cda895383ba647ac8e7824ff3149&k=7bdce41fc240ca01284698295ade9180&cid=145&uid=57444
+中天新闻,https://tv.elibei.com/tv/play?token=de3d24caa0a57bd71a76911e3257fb0e&k=7bdce41fc240ca01284698295ade9180&cid=143&uid=57444
+卫视卡式,https://tv.elibei.com/tv/play?token=e270c2ae0cb65f06b6280eda243c79c5&k=7bdce41fc240ca01284698295ade9180&cid=184154&uid=57444
+三立新闻,https://tv.elibei.com/tv/play?token=b7e7e83428de577d78932557040abc56&k=7bdce41fc240ca01284698295ade9180&cid=206&uid=57444
+三立台湾,https://tv.elibei.com/tv/play?token=fc541322e86e48ee9390e5c19bfcf3d4&k=7bdce41fc240ca01284698295ade9180&cid=62&uid=57444
+HBO,https://tv.elibei.com/tv/play?token=ccf3a368daa9b37e59f9fc0e1f4ddeb7&k=7bdce41fc240ca01284698295ade9180&cid=116&uid=57444
+
+
+
+
+
+
