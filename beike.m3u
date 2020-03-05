@@ -29,6 +29,8 @@ https://tv.elibei.com/tv/play?token=9e57a9dc2fe18ea94a2ad2f556a750c7&k=7bdce41fc
 https://tv.elibei.com/tv/play?token=d8159c193134347fa58fab2c61477458&k=7bdce41fc240ca01284698295ade9180&cid=182405&uid=57444
 #EXTINF:-1,CCTV老故事
 https://tv.elibei.com/tv/play?token=eb76e4b9575ce771a4236e00326ec7cd&k=7bdce41fc240ca01284698295ade9180&cid=278&uid=57444
+#EXTINF:-1,CCTV18
+p2p://fccsovh.pvbox.live:18912/5c18f905000c08fbc07444661e2e685e.ts.ts
 #EXTINF:-1,TVB功夫片
 https://tv.elibei.com/tv/play?token=615886b3a869e15571299092f30562a8&k=7bdce41fc240ca01284698295ade9180&cid=182&uid=57444
 #EXTINF:-1,TVB星河
