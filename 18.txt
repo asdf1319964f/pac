@@ -1,8 +1,0 @@
-果冻,https://gjds.vip/iptv/guodong.m3u
-麻豆,https://gjds.vip/iptv/madou.m3u
-天美,https://gjds.vip/iptv/tianmei.m3u
-精东,https://gjds.vip/iptv/jingdong.m3u
-乐播,https://gjds.vip/iptv/lebo.m3u
-蜜桃,https://gjds.vip/iptv/mitao.m3u
-星空,https://gjds.vip/iptv/xingkong.m3u
-91,https://gjds.vip/iptv/91.m3u
