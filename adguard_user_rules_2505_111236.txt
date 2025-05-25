@@ -1,0 +1,15 @@
+/wgslsw\.com/$replace=/\n\/.*?\.ts//
+/thm3u8\.com/$replace=/\n\/.*?\.jpg//
+/jpzy01\.com/$replace=/\n\/.*?\.jpg//
+/jinpinxm\.com/$replace=/\n\/.*?\.jpg//
+/fhbbf.*?\.com/$replace=/#EXT-X-KEY:METHOD=NONE\n#EXTINF:(3|1\.32)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/lsbbf.*?\.com/$replace=/#EXT-X-KEY:METHOD=NONE\n#EXTINF:(3|2.48)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/jpzy01.*?\.com/$replace=/#EXT-X-PLAYLIST-TYPE:VOD\n\n#EXTINF:(3|1\.24)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/gg155gg1.*?\.com/$replace=/#EXT-X-KEY:METHOD=NONE\n#EXTINF:(3|1\.32)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/atukjhesk.*?\.com/$replace=/#EXT-X-KEY:METHOD=NONE\n#EXTINF:(3|1\.32)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/ddcdnbf.*?\.com/$replace=/#EXT-X-KEY:METHOD=NONE\n#EXTINF:(3|1\.32)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/nbfjhertyrxiang.*?\.com/$replace=/#EXT-X-KEY:METHOD=NONE\n#EXTINF:(3|1\.32)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/newljlj.*?\.com/$replace=/#EXT-X-KEY:METHOD=NONE\n#EXTINF:(3|1\.32)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/sysybf.*?\.com/$replace=/#EXT-X-KEY:METHOD=NONE\n#EXTINF:(3|1\.32)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/ffzy.*?\.com/$replace=/#EXT-X-DISCONTINUITY\n#EXTINF:(2\.433333|2\.966667|3\.333333)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
+/lbb2025.*?\.com/$replace=/#EXT-X-KEY:METHOD=NONE\n#EXTINF:(3|1\.32)\,\n[\s\S]*?#EXT-X-DISCONTINUITY//
