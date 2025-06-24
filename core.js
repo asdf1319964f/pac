@@ -1,16 +1,17 @@
 // core.js - (自包含、功能齐全的最终版)
-// 版本: 1.2.0
+// 版本: 1.2.1
 // 描述: 集成了高级嗅探、M3U8净化、强大的悬浮播放器UI、hls.js加载、CSS样式等所有核心功能。
 
 (function() {
     'use strict';
     
+    // 防止因 onUpdated 多次触发等原因重复注入和执行
     if (window.M3U8_PURIFIER_CORE_LOADED) {
         return;
     }
     window.M3U8_PURIFIER_CORE_LOADED = true;
 
-    console.log('%c[M3U8 Purifier Core] v1.2.0 Executed!', 'color: hotpink; font-size: 16px; font-weight: bold;');
+    console.log('%c[M3U8 Purifier Core] v1.2.1 Executed!', 'color: hotpink; font-size: 16px; font-weight: bold;');
 
     // =================================================================================
     // 模块 1: 全局状态、常量与设置
@@ -20,6 +21,7 @@
     let playerHooked = false;
     let dataScraped = false;
 
+    // 模拟设置，未来可以从 GM_getValue 或插件的 chrome.storage.local 获取
     const settings = {
         m3u8_keywords: ['toutiao', 'qiyi', '/ad', '-ad-', '_ad_'],
         m3u8_smart_slice: true,
@@ -32,9 +34,7 @@
     
     const ICONS = {
         close: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
-        pip: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>`,
-        analyze: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>`,
-        external_player: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm-2 14H5V5h14v12zM12 9l-4 4h8z" transform="rotate(90 12 12)"/></svg>`
+        pip: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>`
     };
 
     // =================================================================================
@@ -42,11 +42,19 @@
     // =================================================================================
     function loadHlsJs() {
         return new Promise((resolve) => {
-            if (typeof Hls !== 'undefined') return resolve();
+            if (typeof Hls !== 'undefined') {
+                return resolve();
+            }
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js';
-            script.onload = resolve;
-            script.onerror = () => { console.error('[Core] Hls.js 加载失败!'); resolve(); }; // 即使失败也resolve，避免阻塞
+            script.onload = () => {
+                console.log('[Core] Hls.js loaded successfully.');
+                resolve();
+            };
+            script.onerror = () => { 
+                console.error('[Core] Hls.js 加载失败!');
+                resolve(); // 即使失败也resolve，避免阻塞，播放器会回退到原生播放
+            };
             document.head.appendChild(script);
         });
     }
@@ -57,15 +65,10 @@
             #m3u8-player-backdrop { position: fixed; inset: 0px; z-index: 2147483646 !important; pointer-events: none; }
             #m3u8-player-container { position: fixed !important; background: #1c1c1e; border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); overflow: visible; display: flex; flex-direction: column; z-index: 2147483647 !important; pointer-events: all; border: 1px solid rgba(255, 255, 255, 0.1); }
             .m3u8-player-header { background: #333; padding: 8px 15px; cursor: move; display: flex; justify-content: space-between; align-items: center; user-select: none; flex-shrink: 0; border-top-left-radius: 11px; border-top-right-radius: 11px; }
-            .m3u8-player-title { color: #fff; font-weight: bold; }
+            .m3u8-player-title { color: #fff; font-weight: bold; font-family: sans-serif; }
             .m3u8-player-controls button { background: none; border: none; color: white; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; padding: 5px; margin-left: 10px; }
             .m3u8-player-controls button:hover { opacity: 1; }
             #purifier-player { width: 100% !important; height: 100% !important; background-color: #000 !important; display: block; flex-grow: 1; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px; }
-            .m3u8-resize-handle { position: absolute; background: transparent; z-index: 10; }
-            .m3u8-resize-handle.handle-n { cursor: ns-resize; height: 10px; left: 10px; right: 10px; top: -5px; }
-            .m3u8-resize-handle.handle-s { cursor: ns-resize; height: 10px; left: 10px; right: 10px; bottom: -5px; }
-            .m3u8-resize-handle.handle-e { cursor: ew-resize; width: 10px; top: 10px; bottom: 10px; right: -5px; }
-            .m3u8-resize-handle.handle-w { cursor: ew-resize; width: 10px; top: 10px; bottom: 10px; left: -5px; }
         `;
         const style = document.createElement('style');
         style.type = 'text/css';
@@ -137,7 +140,7 @@
             isPlayerActive = true;
             this.currentMediaItem = mediaItem;
             
-            document.querySelectorAll('video, audio').forEach(p => { if (p.id !== 'purifier-player') { p.pause(); p.src = ''; p.load(); } });
+            document.querySelectorAll('video, audio').forEach(p => { if (p.id !== 'purifier-player') { p.pause(); try { p.src = ''; p.load(); } catch(e){} } });
             
             const backdrop = document.createElement('div');
             backdrop.id = 'm3u8-player-backdrop';
@@ -212,7 +215,7 @@
                 const coords = e.touches ? e.touches[0] : e;
                 offsetX = coords.clientX - element.offsetLeft;
                 offsetY = coords.clientY - element.offsetTop;
-                document.addEventListener('mousemove', onDragMove);
+                document.addEventListener('mousemove', onDragMove, { passive: true });
                 document.addEventListener('mouseup', onDragEnd, { once: true });
                 document.addEventListener('touchmove', onDragMove, { passive: false });
                 document.addEventListener('touchend', onDragEnd, { once: true });
@@ -301,6 +304,7 @@
                     get: () => (...args) => {
                         const m3u8Url = extractSource(args[0]);
                         if (m3u8Url && !playerHooked) {
+                            console.log(`%c[Core] PlayerHooker SUCCESS! Captured ${name} with M3U8: ${m3u8Url}`, 'color: #00ff00; font-weight: bold;');
                             this.dispatchMediaFoundEvent({ url: m3u8Url, source: `PlayerHook (${name})` });
                             return new Proxy({}, { get: () => () => {} });
                         }
