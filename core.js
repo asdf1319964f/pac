@@ -1,17 +1,14 @@
 // core.js - (自包含、功能齐全的最终版)
-// 版本: 1.2.1
-// 描述: 集成了高级嗅探、M3U8净化、强大的悬浮播放器UI、hls.js加载、CSS样式等所有核心功能。
+// 版本: 1.3.0
+// 描述: 使用更底层的原型链挂钩技术，绕过反Hooking，精准捕获播放器。
 
 (function() {
     'use strict';
     
-    // 防止因 onUpdated 多次触发等原因重复注入和执行
-    if (window.M3U8_PURIFIER_CORE_LOADED) {
-        return;
-    }
-    window.M3U8_PURIFIER_CORE_LOADED = true;
+    if (window.M3U8_PURIFIER_CORE_LOADED_V1_3_0) return;
+    window.M3U8_PURIFIER_CORE_LOADED_V1_3_0 = true;
 
-    console.log('%c[M3U8 Purifier Core] v1.2.1 Executed!', 'color: hotpink; font-size: 16px; font-weight: bold;');
+    console.log('%c[M3U8 Purifier Core] v1.3.0 Executed!', 'color: #00ff7f; font-size: 16px; font-weight: bold;');
 
     // =================================================================================
     // 模块 1: 全局状态、常量与设置
@@ -19,16 +16,12 @@
     const SCRIPT_NAME = 'M3U8 净化平台';
     let isPlayerActive = false;
     let playerHooked = false;
-    let dataScraped = false;
 
-    // 模拟设置，未来可以从 GM_getValue 或插件的 chrome.storage.local 获取
     const settings = {
         m3u8_keywords: ['toutiao', 'qiyi', '/ad', '-ad-', '_ad_'],
         m3u8_smart_slice: true,
         m3u8_auto_play: true,
         m3u8_playback_rate: 1.0,
-        m3u8_gestures: true,
-        m3u8_long_press_speed: 2.5,
         m3u8_floating_pos: { left: '100px', top: '100px', width: '60vw', height: 'auto' }
     };
     
@@ -42,19 +35,11 @@
     // =================================================================================
     function loadHlsJs() {
         return new Promise((resolve) => {
-            if (typeof Hls !== 'undefined') {
-                return resolve();
-            }
+            if (typeof Hls !== 'undefined') return resolve();
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js';
-            script.onload = () => {
-                console.log('[Core] Hls.js loaded successfully.');
-                resolve();
-            };
-            script.onerror = () => { 
-                console.error('[Core] Hls.js 加载失败!');
-                resolve(); // 即使失败也resolve，避免阻塞，播放器会回退到原生播放
-            };
+            script.onload = resolve;
+            script.onerror = () => { console.error('[Core] Hls.js 加载失败!'); resolve(); };
             document.head.appendChild(script);
         });
     }
@@ -147,12 +132,7 @@
             
             const container = document.createElement('div');
             container.id = 'm3u8-player-container';
-            Object.assign(container.style, {
-                left: settings.m3u8_floating_pos.left,
-                top: settings.m3u8_floating_pos.top,
-                width: settings.m3u8_floating_pos.width,
-                height: settings.m3u8_floating_pos.height,
-            });
+            Object.assign(container.style, settings.m3u8_floating_pos);
 
             const header = document.createElement('div');
             header.className = 'm3u8-player-header';
@@ -257,38 +237,16 @@
     }
 
     // =================================================================================
-    // 模块 6: 高级嗅探器 Interceptor
+    // 模块 6: 高级嗅探器 Interceptor (核心升级！)
     // =================================================================================
     const Interceptor = {
         dispatchMediaFoundEvent(payload) {
-            if ((dataScraped && !payload.source.includes('Reddit')) || playerHooked) return;
-            if (payload.source.includes('Reddit')) dataScraped = true;
-            if (payload.source.includes('PlayerHook')) playerHooked = true;
+            if (playerHooked) return;
+            playerHooked = true;
             handleMedia(payload);
         },
         
-        scrapeRedditData() {
-            if (window.location.hostname.includes('reddit.com')) {
-                try {
-                    const dataScript = document.querySelector('script#data');
-                    if (!dataScript || !dataScript.textContent) return;
-                    const jsonString = dataScript.textContent.substring(dataScript.textContent.indexOf('{'));
-                    const jsonData = JSON.parse(jsonString);
-                    if (jsonData?.posts?.models) {
-                        for (const key in jsonData.posts.models) {
-                            const post = jsonData.posts.models[key];
-                            if (post?.media?.is_video && post.media.hls_url) {
-                                this.dispatchMediaFoundEvent({ url: post.media.hls_url, source: 'Reddit Pre-load' });
-                                return;
-                            }
-                        }
-                    }
-                } catch (e) {}
-            }
-        },
-
         hookPlayers() {
-            const playerNames = ['aliplayer', 'DPlayer', 'TCPlayer', 'xgplayer', 'Chimee', 'videojs', 'player'];
             const extractSource = (config) => {
                 if (!config) return null;
                 const potentialKeys = ['source', 'url', 'src'];
@@ -296,61 +254,38 @@
                 if (config.video?.url?.includes('.m3u8')) return config.video.url;
                 return null;
             };
-            playerNames.forEach(name => {
-                let originalPlayer = null;
-                Object.defineProperty(window, name, {
-                    configurable: true,
-                    set: (p) => { originalPlayer = p; },
-                    get: () => (...args) => {
-                        const m3u8Url = extractSource(args[0]);
-                        if (m3u8Url && !playerHooked) {
-                            console.log(`%c[Core] PlayerHooker SUCCESS! Captured ${name} with M3U8: ${m3u8Url}`, 'color: #00ff00; font-weight: bold;');
-                            this.dispatchMediaFoundEvent({ url: m3u8Url, source: `PlayerHook (${name})` });
-                            return new Proxy({}, { get: () => () => {} });
+
+            const playerKeywords = {
+                "DPlayer.version": "DPlayer",
+                "aliplayer": "AliPlayer",
+                "TCPlayer": "TCPlayer",
+                // ...可以添加更多播放器的特征码
+            };
+
+            const originalApply = Function.prototype.apply;
+            Function.prototype.apply = function(context, args) {
+                if (!playerHooked && context && typeof context === 'function') {
+                    const funcString = context.toString();
+                    for (const keyword in playerKeywords) {
+                        if (funcString.includes(keyword)) {
+                            console.log(`%c[Core] Prototype-Hook SUCCESS! ${playerKeywords[keyword]} constructor found!`, 'color: lime; font-weight: bold;');
+                            const config = args && args[0] ? args[0] : null;
+                            const m3u8Url = extractSource(config);
+
+                            if (m3u8Url) {
+                                console.log(`[Core] Captured M3U8 from ${playerKeywords[keyword]} config: ${m3u8Url}`);
+                                Interceptor.dispatchMediaFoundEvent({ url: m3u8Url, source: `${playerKeywords[keyword]} ProtoHook` });
+                                return {}; // 禁用原始播放器
+                            }
                         }
-                        if (typeof originalPlayer === 'function') {
-                            try { return new originalPlayer(...args); } catch (e) { return originalPlayer(...args); }
-                        }
-                        return originalPlayer;
                     }
-                });
-            });
-        },
-
-        hookNetworkAndAPIs() {
-            const originalFetch = window.fetch;
-            window.fetch = async (...args) => {
-                const request = new Request(args[0], args[1]);
-                if (!playerHooked && !dataScraped && request.url.includes('.m3u8')) {
-                    try {
-                        const response = await originalFetch(request);
-                        if (response.ok) {
-                            const cloned = response.clone();
-                            cloned.text().then(body => this.dispatchMediaFoundEvent({ url: cloned.url, source: 'Fetch M3U8', responseText: body }));
-                        }
-                        return response;
-                    } catch(e) {}
                 }
-                return originalFetch(...args);
-            };
-
-            const originalCreateObjectURL = URL.createObjectURL;
-            window.URL.createObjectURL = (obj) => {
-                const url = originalCreateObjectURL(obj);
-                if (!playerHooked && !dataScraped && (obj instanceof Blob) && (obj.type.startsWith('video/') || obj.type.startsWith('audio/') || obj.type.includes('mpegurl'))) {
-                    this.dispatchMediaFoundEvent({ url, source: `Blob (${obj.type})`});
-                }
-                return url;
+                return originalApply.call(this, context, args);
             };
         },
-
+        
         activate() {
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => this.scrapeRedditData());
-            } else { this.scrapeRedditData(); }
-            
             this.hookPlayers();
-            this.hookNetworkAndAPIs();
         }
     };
 
