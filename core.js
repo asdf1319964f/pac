@@ -1,14 +1,17 @@
-// core.js (最终隐身攻击版 - 隔离世界 + 原型链污染 + DOM事件通信)
-// 版本: 6.0.0
-// 描述: 回归最高效的原型链污染，并在隔离世界中通过DOM事件安全地传递数据。
+// core.js (最终全火力版)
+// 版本: 7.0.0
+// 描述: 同时激活所有嗅探策略，确保万无一失。网络嗅探将作为捕获 hls.js 请求的主力。
 
 (function() {
     'use strict';
     
-    // 这个标志位由 background.js 注入时设置，确保本文件只执行一次
-    // if (window.M3U8_PURIFIER_INJECTED_FLAG_V6_0_0) return;
-    
-    console.log('%c[M3U8 Purifier Core] v6.0.0 Executed! (Isolated World Stealth Mode)', 'color: orange; font-size: 16px; font-weight: bold;');
+    // 使用一个独一无二的版本标志位，防止重复执行
+    if (window.M3U8_PURIFIER_CORE_LOADED_V7_0_0) {
+        return;
+    }
+    window.M3U8_PURIFIER_CORE_LOADED_V7_0_0 = true;
+
+    console.log('%c[M3U8 Purifier Core] v7.0.0 Executed! (All Systems Go!)', 'color: red; font-size: 16px; font-weight: bold;');
 
     // =================================================================================
     // 模块 1: 全局状态、常量与设置
@@ -36,7 +39,7 @@
             if (typeof Hls !== 'undefined') return resolve();
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js';
-            script.onload = resolve;
+            script.onload = () => { console.log('[Core] Hls.js loaded.'); resolve(); };
             script.onerror = () => { console.error('[Core] Hls.js 加载失败!'); resolve(); };
             document.head.appendChild(script);
         });
@@ -176,7 +179,7 @@
         if (window.self !== window.top || mediaFoundAndHandled) return;
         mediaFoundAndHandled = true;
         
-        console.log(`%c[Core] Media captured by "${mediaItem.source}". Locking further captures.`, 'color: violet; font-weight: bold;');
+        console.log(`%c[Core] Media captured by "${mediaItem.source}". Locking captures.`, 'color: violet; font-weight: bold;');
         
         await loadHlsJs();
         if (mediaItem.url.toLowerCase().includes('.m3u8') && mediaItem.responseText) {
@@ -186,41 +189,60 @@
     }
 
     // =================================================================================
-    // 模块 6: 终极嗅探器 Interceptor
+    // 模块 6: 终极嗅探器 Interceptor (全火力开启)
     // =================================================================================
     const Interceptor = {
+        
+        // 策略1: 原型链挂钩 (作为第一道防线，捕获初始化时的配置)
         hookViaPrototype() {
             const extractSource = (config) => {
-                if (!config) return null;
-                const url = config.video?.url;
+                const url = config?.video?.url;
                 return (url && typeof url === 'string' && url.includes('.m3u8')) ? url : null;
             };
 
             const originalApply = Function.prototype.apply;
-            
-            const newApply = function(context, args) {
-                if (!mediaFoundAndHandled && context && typeof context === 'function' && context.toString) {
+            Function.prototype.apply = function(context, args) {
+                if (!mediaFoundAndHandled && context?.toString) {
                     try {
                         if (context.toString().includes("DPlayer.version")) {
-                            console.log('%c[Core] Prototype-Hook SUCCESS! DPlayer constructor found!', 'color: lime; font-weight: bold;');
                             const m3u8Url = extractSource(args && args[0]);
                             if (m3u8Url) {
-                                document.dispatchEvent(new CustomEvent('__M3U8_PURIFIER_FOUND__', {
-                                    detail: { url: m3u8Url, source: `DPlayer ProtoHook` }
-                                }));
-                                return {};
+                                handleMedia({ url: m3u8Url, source: `DPlayer ProtoHook` });
                             }
                         }
                     } catch (e) {}
                 }
                 return originalApply.call(this, context, args);
-};
-
-            Function.prototype.apply = newApply;
+            };
         },
         
+        // 策略2: 网络和API嗅探 (主力！捕获 hls.js 或其他库发出的请求)
+        hookNetworkAndAPIs() {
+            const originalFetch = window.fetch;
+            window.fetch = async (...args) => {
+                const request = new Request(args[0], args[1]);
+                if (!mediaFoundAndHandled && request.url.includes('.m3u8')) {
+                    console.log('%c[Core] Network Hook SUCCESS! Captured M3U8 fetch!', 'color: blue; font-weight: bold;');
+                    try {
+                        const response = await originalFetch(request);
+                        if (response.ok) {
+                            const cloned = response.clone();
+                            cloned.text().then(body => handleMedia({ url: cloned.url, source: 'Fetch M3U8', responseText: body }));
+                        }
+                        return response;
+                    } catch(e) {
+                        // 即使 fetch 失败，也把 URL 交出去尝试播放
+                        handleMedia({ url: request.url, source: 'Fetch M3U8 (request only)' });
+                    }
+                }
+                return originalFetch(...args);
+            };
+        },
+
         activate() {
+            console.log('[Core] Activating all interceptors...');
             this.hookViaPrototype();
+            this.hookNetworkAndAPIs();
         }
     };
 
@@ -228,15 +250,7 @@
     // 模块 7: 启动入口
     // =================================================================================
     function initialize() {
-        // 只有顶层窗口才需要UI
-        if (window.self === window.top) {
-            injectStyles();
-        }
-        
-        document.addEventListener('__M3U8_PURIFIER_FOUND__', (event) => {
-            handleMedia(event.detail);
-        }, { once: true });
-
+        injectStyles();
         Interceptor.activate();
     }
     
