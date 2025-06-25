@@ -1,27 +1,28 @@
-// core.js (生产最终版)
-// 版本: 5.1.0
-// 描述: 集成DOM扫描、轮询、网络嗅探等多种技术，并包含完整播放器UI和设置面板。
+// core.js (最终隐身攻击版 - 隔离世界 + 原型链污染 + DOM事件通信)
+// 版本: 6.0.0
+// 描述: 回归最高效的原型链污染，并在隔离世界中通过DOM事件安全地传递数据。
 
 (function() {
     'use strict';
     
-    // 使用一个在 background.js 中定义的、独一无二的标志位
-    // 这个标志位由加载器脚本注入时设置，确保本文件只执行一次
-    // 示例: if (window.M3U8_PURIFIER_INJECTED_FLAG_FINAL_STRIKE) return;
-    // 为确保独立性，这里再加一道保险
-    if (window.M3U8_PURIFIER_CORE_EXECUTED_V5_1_0) return;
-    window.M3U8_PURIFIER_CORE_EXECUTED_V5_1_0 = true;
-
-    console.log('%c[M3U8 Purifier Core] v5.1.0 (Production) Activated!', 'color: #1E90FF; font-size: 16px; font-weight: bold;');
+    // 这个标志位由 background.js 注入时设置，确保本文件只执行一次
+    // if (window.M3U8_PURIFIER_INJECTED_FLAG_V6_0_0) return;
+    
+    console.log('%c[M3U8 Purifier Core] v6.0.0 Executed! (Isolated World Stealth Mode)', 'color: orange; font-size: 16px; font-weight: bold;');
 
     // =================================================================================
     // 模块 1: 全局状态、常量与设置
     // =================================================================================
     const SCRIPT_NAME = 'M3U8 净化平台';
     let isPlayerActive = false;
-    let mediaFoundAndHandled = false; // 全局锁，确保只处理一次
-    let localSettings = {}; // 用于缓存从background获取的设置
+    let mediaFoundAndHandled = false;
 
+    const settings = {
+        m3u8_keywords: ['toutiao', 'qiyi', '/ad', '-ad-', '_ad_'],
+        m3u8_auto_play: true,
+        m3u8_floating_pos: { left: '100px', top: '100px', width: '60vw', height: 'auto' }
+    };
+    
     const ICONS = {
         close: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
         pip: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>`
@@ -44,7 +45,7 @@
     function injectStyles() {
         if (document.getElementById('m3u8-purifier-styles')) return;
         const css = `
-            #m3u8-player-backdrop { position: fixed; inset: 0px; z-index: 2147483646 !important; pointer-events: none; }
+            #m3u8-player-backdrop { position: fixed; inset: 0px; z-index: 2147483647 !important; pointer-events: none; }
             #m3u8-player-container { position: fixed !important; background: #1c1c1e; border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); overflow: visible; display: flex; flex-direction: column; z-index: 2147483647 !important; pointer-events: all; border: 1px solid rgba(255, 255, 255, 0.1); }
             .m3u8-player-header { background: #333; padding: 8px 15px; cursor: move; display: flex; justify-content: space-between; align-items: center; user-select: none; flex-shrink: 0; border-top-left-radius: 11px; border-top-right-radius: 11px; }
             .m3u8-player-title { color: #fff; font-weight: bold; font-family: sans-serif; }
@@ -67,7 +68,7 @@
             const urlObj = new URL(m3u8Url, self.location.href);
             const origin = urlObj.origin;
             const basePath = m3u8Url.substring(0, m3u8Url.lastIndexOf('/') + 1);
-            const keywords = localSettings.keywords || [];
+            const keywords = settings.m3u8_keywords || [];
             const finalLines = [];
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
@@ -85,9 +86,7 @@
                 }
             }
             return finalLines.join('\n');
-        } catch (e) {
-            return text;
-        }
+        } catch (e) { return text; }
     }
 
     // =================================================================================
@@ -104,7 +103,7 @@
             backdrop.id = 'm3u8-player-backdrop';
             const container = document.createElement('div');
             container.id = 'm3u8-player-container';
-            Object.assign(container.style, localSettings.floatingPos || { left: '100px', top: '100px', width: '60vw', height: 'auto' });
+            Object.assign(container.style, settings.m3u8_floating_pos);
             const header = document.createElement('div');
             header.className = 'm3u8-player-header';
             header.innerHTML = `<span class="m3u8-player-title">${SCRIPT_NAME}</span><div class="m3u8-player-controls"><button id="purifier-pip-btn" title="画中画">${ICONS.pip}</button><button id="purifier-close-btn" title="关闭">${ICONS.close}</button></div>`;
@@ -169,67 +168,15 @@
             handle.addEventListener('touchstart', onDragStart, { passive: false });
         }
     };
-    
-    const SettingsPanel = {
-        isOpen: false, panelElement: null,
-        toggle() { this.isOpen ? this.close() : this.open(); },
-        async open() {
-            if (this.isOpen) return;
-            this.isOpen = true;
-            localSettings = await new Promise(resolve => chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, r => resolve(r || {})));
-            this.panelElement = document.createElement('div');
-            this.panelElement.style.cssText = `position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(8px); z-index: 2147483647; display: flex; align-items: center; justify-content: center; font-family: sans-serif;`;
-            this.panelElement.innerHTML = `
-                <div style="background: #2c2c2e; color: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 600px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
-                    <h2 style="text-align:center; margin-top:0;">${SCRIPT_NAME} 设置</h2>
-                    <div style="margin-bottom: 15px;">
-                        <label for="purifier-keywords">广告关键词 (一行一个):</label>
-                        <textarea id="purifier-keywords" style="width: 100%; height: 100px; background: #3a3a3c; color: white; border: 1px solid #555; border-radius: 6px; margin-top: 5px; padding: 8px; box-sizing: border-box;">${(localSettings.keywords || ['/ad', '-ad-']).join('\n')}</textarea>
-                    </div>
-                    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <label for="purifier-autoplay">捕获后自动播放</label>
-                        <input type="checkbox" id="purifier-autoplay" ${localSettings.autoPlay !== false ? 'checked' : ''}>
-                    </div>
-                    <div style="text-align: right; border-top: 1px solid #444; padding-top: 20px;">
-                        <button id="purifier-close-settings" style="margin-right: 10px; padding: 8px 16px;">关闭</button>
-                        <button id="purifier-save-settings" style="padding: 8px 16px; background-color: #007aff; border: none; color: white; border-radius: 6px;">保存</button>
-                    </div>
-                </div>`;
-            document.body.appendChild(this.panelElement);
-            this.panelElement.querySelector('#purifier-close-settings').addEventListener('click', () => this.close());
-            this.panelElement.querySelector('#purifier-save-settings').addEventListener('click', async () => {
-                const settingsToSave = {
-                    keywords: this.panelElement.querySelector('#purifier-keywords').value.split('\n').map(k => k.trim()).filter(Boolean),
-                    autoPlay: this.panelElement.querySelector('#purifier-autoplay').checked
-                };
-                await new Promise(resolve => chrome.runtime.sendMessage({ type: 'SAVE_SETTINGS', payload: settingsToSave }, resolve));
-                localSettings = {...localSettings, ...settingsToSave};
-                alert('设置已保存！');
-                this.close();
-            });
-        },
-        close() {
-            if (!this.isOpen || !this.panelElement) return;
-            this.panelElement.remove();
-            this.panelElement = null;
-            this.isOpen = false;
-        }
-    };
 
     // =================================================================================
-    // 模块 5: 主处理函数 (全局锁)
+    // 模块 5: 主处理函数
     // =================================================================================
     async function handleMedia(mediaItem) {
         if (window.self !== window.top || mediaFoundAndHandled) return;
         mediaFoundAndHandled = true;
         
         console.log(`%c[Core] Media captured by "${mediaItem.source}". Locking further captures.`, 'color: violet; font-weight: bold;');
-        
-        if (localSettings.autoPlay === false) {
-             console.log('[Core] Autoplay is disabled.');
-             mediaFoundAndHandled = false;
-             return;
-        }
         
         await loadHlsJs();
         if (mediaItem.url.toLowerCase().includes('.m3u8') && mediaItem.responseText) {
@@ -242,98 +189,55 @@
     // 模块 6: 终极嗅探器 Interceptor
     // =================================================================================
     const Interceptor = {
-        scanDOMForPlayerConfig() {
-            if (mediaFoundAndHandled) return;
-            const scripts = document.querySelectorAll('script');
-            const regex = /new\s+DPlayer\s*\(([\s\S]*?\{[\s\S]*?url[\s\S]*?\.m3u8[\s\S]*?})\s*\)/;
-            for (const script of scripts) {
-                if (script.textContent) {
-                    const match = script.textContent.match(regex);
-                    if (match && match[1]) {
-                        console.log('%c[Core] DOM Scan SUCCESS! Found DPlayer config.', 'color: blue; font-weight: bold;');
-                        try {
-                           const urlMatch = match[1].match(/url\s*:\s*['"](http[^'"]+\.m3u8[^'"]*)['"]/);
-                           if(urlMatch && urlMatch[1]){
-                               handleMedia({ url: urlMatch[1], source: 'DOM Scan (DPlayer Regex)' });
-                               return;
-                           }
-                        } catch (e) {}
-                    }
-                }
-            }
-        },
-        startPlayerPolling() {
-            let attempts = 0;
-            const interval = setInterval(() => {
-                if (mediaFoundAndHandled || attempts++ > 20) {
-                    clearInterval(interval); return;
-                }
-                if (typeof window.DPlayer === 'function') {
-                    clearInterval(interval);
-                    const OriginalDPlayer = window.DPlayer;
-                    window.DPlayer = function(...args) {
-                        const url = args[0]?.video?.url;
-                        if (url && url.includes('.m3u8')) {
-                            handleMedia({ url, source: `DPlayer Polling` });
-                            return {};
-                        }
-                        return new OriginalDPlayer(...args);
-                    };
-                }
-            }, 500);
-        },
-        hookNetworkAndAPIs() {
-            const originalFetch = window.fetch;
-            window.fetch = async (...args) => {
-                const request = new Request(args[0], args[1]);
-                if (!mediaFoundAndHandled && request.url.includes('.m3u8')) {
-                    try {
-                        const response = await originalFetch(request);
-                        if (response.ok) {
-                            const cloned = response.clone();
-                            cloned.text().then(body => handleMedia({ url: cloned.url, source: 'Fetch M3U8', responseText: body }));
-                        }
-                        return response;
-                    } catch(e) {}
-                }
-                return originalFetch(...args);
+        hookViaPrototype() {
+            const extractSource = (config) => {
+                if (!config) return null;
+                const url = config.video?.url;
+                return (url && typeof url === 'string' && url.includes('.m3u8')) ? url : null;
             };
+
+            const originalApply = Function.prototype.apply;
+            
+            const newApply = function(context, args) {
+                if (!mediaFoundAndHandled && context && typeof context === 'function' && context.toString) {
+                    try {
+                        if (context.toString().includes("DPlayer.version")) {
+                            console.log('%c[Core] Prototype-Hook SUCCESS! DPlayer constructor found!', 'color: lime; font-weight: bold;');
+                            const m3u8Url = extractSource(args && args[0]);
+                            if (m3u8Url) {
+                                document.dispatchEvent(new CustomEvent('__M3U8_PURIFIER_FOUND__', {
+                                    detail: { url: m3u8Url, source: `DPlayer ProtoHook` }
+                                }));
+                                return {};
+                            }
+                        }
+                    } catch (e) {}
+                }
+                return originalApply.call(this, context, args);
+};
+
+            Function.prototype.apply = newApply;
         },
+        
         activate() {
-            if (document.readyState === 'complete') {
-                this.scanDOMForPlayerConfig();
-            } else {
-                window.addEventListener('load', () => this.scanDOMForPlayerConfig(), { once: true });
-            }
-            this.startPlayerPolling();
-            this.hookNetworkAndAPIs();
+            this.hookViaPrototype();
         }
     };
 
     // =================================================================================
     // 模块 7: 启动入口
     // =================================================================================
-    async function initialize() {
-        // 从 background 获取初始设置
-        localSettings = await new Promise(resolve => {
-            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
-                chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, r => resolve(r || { autoPlay: true, keywords: [] }));
-            } else {
-                resolve({ autoPlay: true, keywords: [] }); // 备用默认值
-            }
-        });
-
-        injectStyles();
-        Interceptor.activate();
-
-        // 监听来自 background 的菜单命令
-        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
-            chrome.runtime.onMessage.addListener((message) => {
-                if (message.type === 'TOGGLE_SETTINGS_PANEL' && window.self === window.top) {
-                    SettingsPanel.toggle();
-                }
-            });
+    function initialize() {
+        // 只有顶层窗口才需要UI
+        if (window.self === window.top) {
+            injectStyles();
         }
+        
+        document.addEventListener('__M3U8_PURIFIER_FOUND__', (event) => {
+            handleMedia(event.detail);
+        }, { once: true });
+
+        Interceptor.activate();
     }
     
     initialize();
