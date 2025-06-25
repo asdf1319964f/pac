@@ -6,12 +6,12 @@
     'use strict';
     
     // 使用带版本的标志位，确保每次更新都能重新注入
-    if (window.M3U8_PURIFIER_CORE_LOADED_V2_1_0) {
+    if (window.M3U8_PURIFIER_CORE_LOADED_V3_0_0) {
         return;
     }
-    window.M3U8_PURIFIER_CORE_LOADED_V2_1_0 = true;
+    window.M3U8_PURIFIER_CORE_LOADED_V3_0_0 = true;
 
-    console.log('%c[M3U8 Purifier Core] v2.1.0 Executed! (DOM Scan Edition)', 'color: red; font-size: 16px; font-weight: bold;');
+    console.log('%c[M3U8 Purifier Core] v3.0.0 Executed! (DOM Scan Edition)', 'color: red; font-size: 16px; font-weight: bold;');
 
     // =================================================================================
     // 模块 1: 全局状态、常量与设置
