@@ -5,7 +5,10 @@
 (function() {
     'use strict';
     
-    if (window.M3U8_PURIFIER_CORE_LOADED_V2_0_0) return;
+    // 使用带版本的标志位，确保每次更新都能重新注入
+    if (window.M3U8_PURIFIER_CORE_LOADED_V2_0_0) {
+        return;
+    }
     window.M3U8_PURIFIER_CORE_LOADED_V2_0_0 = true;
 
     console.log('%c[M3U8 Purifier Core] v2.0.0 Executed! (Ultimate Edition)', 'color: gold; font-size: 16px; font-weight: bold;');
@@ -146,7 +149,7 @@
                 this.currentPlayerContainer.remove();
             }
             isPlayerActive = false;
-            mediaFoundAndHandled = false; // 重置全局锁，允许捕获新视频
+            mediaFoundAndHandled = false;
         },
         makeDraggable(element, handle) {
             let isDragging = false, offsetX, offsetY;
@@ -178,7 +181,7 @@
     // =================================================================================
     async function handleMedia(mediaItem) {
         if (window.self !== window.top || mediaFoundAndHandled) return;
-        mediaFoundAndHandled = true; // 锁定！
+        mediaFoundAndHandled = true;
         
         console.log(`%c[Core] Media captured by "${mediaItem.source}". Locking further captures.`, 'color: violet; font-weight: bold;');
         
@@ -218,12 +221,13 @@
         // 策略2: 轮询挂钩 (应对反调试)
         startPlayerPolling() {
             let attempts = 0;
-            const maxAttempts = 20;
+            const maxAttempts = 20; // 最多轮询10秒
             const interval = setInterval(() => {
                 if (mediaFoundAndHandled || attempts++ > maxAttempts) {
                     clearInterval(interval);
                     return;
                 }
+                // 轮询 DPlayer
                 if (typeof window.DPlayer === 'function') {
                     clearInterval(interval);
                     const OriginalDPlayer = window.DPlayer;
@@ -235,33 +239,12 @@
                             return {};
                         }
                         return new OriginalDPlayer(...args);
-                    };
+};
                 }
             }, 500);
         },
 
-        // 策略3: 原型链挂钩 (通用播放器)
-        hookViaPrototype() {
-            const playerKeywords = {"aliplayer": "AliPlayer", "TCPlayer": "TCPlayer"};
-            const originalApply = Function.prototype.apply;
-            Function.prototype.apply = function(context, args) {
-                if (!mediaFoundAndHandled && context?.toString) {
-                    const funcString = context.toString();
-                    for (const keyword in playerKeywords) {
-                        if (funcString.includes(keyword)) {
-                            const url = args[0]?.source;
-                            if (url && url.includes('.m3u8')) {
-                                handleMedia({ url, source: `${playerKeywords[keyword]} ProtoHook` });
-                                return {};
-                            }
-                        }
-                    }
-                }
-                return originalApply.call(this, context, args);
-            };
-        },
-        
-        // 策略4: 网络和API嗅探 (最后保障)
+        // 策略3: 网络和API嗅探 (最后保障)
         hookNetworkAndAPIs() {
             const originalFetch = window.fetch;
             window.fetch = async (...args) => {
@@ -295,7 +278,6 @@
             } else { this.scrapeKnownSites(); }
             
             this.startPlayerPolling();
-            this.hookViaPrototype();
             this.hookNetworkAndAPIs();
         }
     };
