@@ -1,21 +1,21 @@
-// core.js - (自包含、功能齐全的最终版)
-// 版本: 1.3.0
-// 描述: 使用更底层的原型链挂钩技术，绕过反Hooking，精准捕获播放器。
+// core.js (终极整合版 - 多层嗅探协同作战)
+// 版本: 2.0.0
+// 描述: 集成定点抓取、轮询挂钩、原型链挂钩、网络嗅探等多种技术，形成全方位、高鲁棒性的媒体嗅探核心。
 
 (function() {
     'use strict';
     
-    if (window.M3U8_PURIFIER_CORE_LOADED_V1_3_0) return;
-    window.M3U8_PURIFIER_CORE_LOADED_V1_3_0 = true;
+    if (window.M3U8_PURIFIER_CORE_LOADED_V2_0_0) return;
+    window.M3U8_PURIFIER_CORE_LOADED_V2_0_0 = true;
 
-    console.log('%c[M3U8 Purifier Core] v1.3.0 Executed!', 'color: #00ff7f; font-size: 16px; font-weight: bold;');
+    console.log('%c[M3U8 Purifier Core] v2.0.0 Executed! (Ultimate Edition)', 'color: gold; font-size: 16px; font-weight: bold;');
 
     // =================================================================================
     // 模块 1: 全局状态、常量与设置
     // =================================================================================
     const SCRIPT_NAME = 'M3U8 净化平台';
     let isPlayerActive = false;
-    let playerHooked = false;
+    let mediaFoundAndHandled = false; // 全局锁，确保只处理一次
 
     const settings = {
         m3u8_keywords: ['toutiao', 'qiyi', '/ad', '-ad-', '_ad_'],
@@ -52,7 +52,6 @@
             .m3u8-player-header { background: #333; padding: 8px 15px; cursor: move; display: flex; justify-content: space-between; align-items: center; user-select: none; flex-shrink: 0; border-top-left-radius: 11px; border-top-right-radius: 11px; }
             .m3u8-player-title { color: #fff; font-weight: bold; font-family: sans-serif; }
             .m3u8-player-controls button { background: none; border: none; color: white; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; padding: 5px; margin-left: 10px; }
-            .m3u8-player-controls button:hover { opacity: 1; }
             #purifier-player { width: 100% !important; height: 100% !important; background-color: #000 !important; display: block; flex-grow: 1; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px; }
         `;
         const style = document.createElement('style');
@@ -67,18 +66,10 @@
     // =================================================================================
     function processM3U8(text, m3u8Url) {
         let lines = text.split('\n');
-        if (settings.m3u8_smart_slice) {
-            const dIndex = lines.findIndex(l => l.includes('#EXT-X-DISCONTINUITY'));
-            if (dIndex > 0) {
-                const hIndex = lines.findIndex(l => l.includes('#EXTINF'));
-                if (hIndex > -1) lines = [...lines.slice(0, hIndex), ...lines.slice(dIndex)];
-            }
-        }
         try {
             const urlObj = new URL(m3u8Url, self.location.href);
             const origin = urlObj.origin;
             const basePath = m3u8Url.substring(0, m3u8Url.lastIndexOf('/') + 1);
-            const query = urlObj.search;
             const keywords = settings.m3u8_keywords || [];
             const finalLines = [];
             for (let i = 0; i < lines.length; i++) {
@@ -90,25 +81,14 @@
                         continue;
                     }
                     let resolvedLine = line;
-                    if (!resolvedLine.startsWith('http')) resolvedLine = (resolvedLine.startsWith('/') ? origin + resolvedLine : basePath + resolvedLine) + query;
+                    if (!resolvedLine.startsWith('http')) resolvedLine = (resolvedLine.startsWith('/') ? origin + resolvedLine : basePath + resolvedLine);
                     finalLines.push(resolvedLine);
-                } else if (line.startsWith('#EXT-X-KEY')) {
-                    const uriMatch = line.match(/URI="([^"]+)"/);
-                    if (uriMatch && uriMatch[1] && !uriMatch[1].startsWith('http')) {
-                        const absUri = uriMatch[1].startsWith('/') ? origin + uriMatch[1] : basePath + uriMatch[1];
-                        finalLines.push(line.replace(uriMatch[1], absUri));
-                    } else {
-                        finalLines.push(line);
-                    }
                 } else {
                     finalLines.push(line);
                 }
             }
-            let result = finalLines.join('\n');
-            if (!result.trim().startsWith('#EXTM3U')) result = '#EXTM3U\n' + result;
-            return result;
+            return finalLines.join('\n');
         } catch (e) {
-            console.error("[Core] M3U8 processing failed:", e);
             return text;
         }
     }
@@ -118,53 +98,37 @@
     // =================================================================================
     const PlayerManager = {
         currentPlayerContainer: null,
-        currentMediaItem: null,
-        
         injectPlayer(mediaItem) {
             if (isPlayerActive) this.destroyPlayer();
             isPlayerActive = true;
-            this.currentMediaItem = mediaItem;
-            
-            document.querySelectorAll('video, audio').forEach(p => { if (p.id !== 'purifier-player') { p.pause(); try { p.src = ''; p.load(); } catch(e){} } });
+            document.querySelectorAll('video, audio').forEach(p => { if (p.id !== 'purifier-player') { p.pause(); } });
             
             const backdrop = document.createElement('div');
             backdrop.id = 'm3u8-player-backdrop';
-            
             const container = document.createElement('div');
             container.id = 'm3u8-player-container';
             Object.assign(container.style, settings.m3u8_floating_pos);
-
             const header = document.createElement('div');
             header.className = 'm3u8-player-header';
             header.innerHTML = `<span class="m3u8-player-title">${SCRIPT_NAME}</span><div class="m3u8-player-controls"><button id="purifier-pip-btn" title="画中画">${ICONS.pip}</button><button id="purifier-close-btn" title="关闭">${ICONS.close}</button></div>`;
-            
             const video = document.createElement('video');
             video.id = 'purifier-player';
-            
             container.append(header, video);
             backdrop.appendChild(container);
             document.body.appendChild(backdrop);
-
             this.setupPlayer(video, mediaItem);
             this.currentPlayerContainer = backdrop;
-            
             header.querySelector('#purifier-close-btn').addEventListener('click', () => this.destroyPlayer());
-            header.querySelector('#purifier-pip-btn').addEventListener('click', () => video.requestPictureInPicture().catch(e => alert('画中画失败!')));
+            header.querySelector('#purifier-pip-btn').addEventListener('click', () => video.requestPictureInPicture().catch(() => {}));
             this.makeDraggable(container, header);
         },
-
         setupPlayer(video, mediaItem) {
             video.controls = true;
             video.autoplay = true;
-            video.playbackRate = settings.m3u8_playback_rate;
-
             let urlToPlay = mediaItem.url;
             if (mediaItem.processedContent) {
-                try {
-                    urlToPlay = `data:application/vnd.apple.mpegurl;base64,${btoa(unescape(encodeURIComponent(mediaItem.processedContent)))}`;
-                } catch (e) { console.error('[Core] Data URL creation failed', e); }
+                try { urlToPlay = `data:application/vnd.apple.mpegurl;base64,${btoa(unescape(encodeURIComponent(mediaItem.processedContent)))}`; } catch (e) {}
             }
-
             if (typeof Hls !== 'undefined' && Hls.isSupported() && (urlToPlay.includes('.m3u8') || urlToPlay.startsWith('data:application'))) {
                 const hls = new Hls({ debug: false });
                 hls.loadSource(urlToPlay);
@@ -173,20 +137,17 @@
             } else {
                 video.src = urlToPlay;
             }
-            
-            video.play().catch(e => console.warn('[Core] Autoplay was prevented.', e));
+            video.play().catch(() => {});
         },
-        
         destroyPlayer() {
             if (this.currentPlayerContainer) {
                 const video = this.currentPlayerContainer.querySelector('video');
                 if (video && video.hls) video.hls.destroy();
                 this.currentPlayerContainer.remove();
-                this.currentPlayerContainer = null;
             }
             isPlayerActive = false;
+            mediaFoundAndHandled = false; // 重置全局锁，允许捕获新视频
         },
-
         makeDraggable(element, handle) {
             let isDragging = false, offsetX, offsetY;
             const onDragStart = (e) => {
@@ -201,81 +162,97 @@
                 document.addEventListener('touchend', onDragEnd, { once: true });
             };
             const onDragMove = (e) => {
-                if (!isDragging) return;
-                e.preventDefault();
+                if (!isDragging) return; e.preventDefault();
                 const coords = e.touches ? e.touches[0] : e;
                 element.style.left = `${coords.clientX - offsetX}px`;
                 element.style.top = `${coords.clientY - offsetY}px`;
             };
-            const onDragEnd = () => {
-                if (!isDragging) return;
-                isDragging = false;
-                document.removeEventListener('mousemove', onDragMove);
-                document.removeEventListener('touchmove', onDragMove);
-                settings.m3u8_floating_pos.left = element.style.left;
-                settings.m3u8_floating_pos.top = element.style.top;
-            };
+            const onDragEnd = () => { isDragging = false; };
             handle.addEventListener('mousedown', onDragStart);
             handle.addEventListener('touchstart', onDragStart, { passive: false });
         }
     };
 
     // =================================================================================
-    // 模块 5: 主处理函数 (连接嗅探器和播放器)
+    // 模块 5: 主处理函数 (全局锁)
     // =================================================================================
     async function handleMedia(mediaItem) {
-        if (window.self !== window.top) return;
-        if (!settings.m3u8_auto_play) return;
+        if (window.self !== window.top || mediaFoundAndHandled) return;
+        mediaFoundAndHandled = true; // 锁定！
+        
+        console.log(`%c[Core] Media captured by "${mediaItem.source}". Locking further captures.`, 'color: violet; font-weight: bold;');
         
         await loadHlsJs();
-
         if (mediaItem.url.toLowerCase().includes('.m3u8') && mediaItem.responseText) {
             mediaItem.processedContent = processM3U8(mediaItem.responseText, mediaItem.url);
         }
-        
         PlayerManager.injectPlayer(mediaItem);
     }
 
     // =================================================================================
-    // 模块 6: 高级嗅探器 Interceptor (核心升级！)
+    // 模块 6: 终极嗅探器 Interceptor
     // =================================================================================
     const Interceptor = {
-        dispatchMediaFoundEvent(payload) {
-            if (playerHooked) return;
-            playerHooked = true;
-            handleMedia(payload);
-        },
         
-        hookPlayers() {
-            const extractSource = (config) => {
-                if (!config) return null;
-                const potentialKeys = ['source', 'url', 'src'];
-                for (const key of potentialKeys) if (typeof config[key] === 'string' && config[key].includes('.m3u8')) return config[key];
-                if (config.video?.url?.includes('.m3u8')) return config.video.url;
-                return null;
-            };
+        // 策略1: 定点数据抓取 (最高优先级)
+        scrapeKnownSites() {
+            if (window.location.hostname.includes('reddit.com')) {
+                try {
+                    const dataScript = document.querySelector('script#data');
+                    if (!dataScript?.textContent) return;
+                    const jsonString = dataScript.textContent.substring(dataScript.textContent.indexOf('{'));
+                    const jsonData = JSON.parse(jsonString);
+                    if (jsonData?.posts?.models) {
+                        for (const key in jsonData.posts.models) {
+                            const post = jsonData.posts.models[key];
+                            if (post?.media?.is_video && post.media.hls_url) {
+                                handleMedia({ url: post.media.hls_url, source: 'Reddit Pre-load' });
+                                return;
+                            }
+                        }
+                    }
+                } catch (e) {}
+            }
+        },
 
-            const playerKeywords = {
-                "DPlayer.version": "DPlayer",
-                "aliplayer": "AliPlayer",
-                "TCPlayer": "TCPlayer",
-                // ...可以添加更多播放器的特征码
-            };
+        // 策略2: 轮询挂钩 (应对反调试)
+        startPlayerPolling() {
+            let attempts = 0;
+            const maxAttempts = 20;
+            const interval = setInterval(() => {
+                if (mediaFoundAndHandled || attempts++ > maxAttempts) {
+                    clearInterval(interval);
+                    return;
+                }
+                if (typeof window.DPlayer === 'function') {
+                    clearInterval(interval);
+                    const OriginalDPlayer = window.DPlayer;
+                    window.DPlayer = function(...args) {
+                        const config = args[0] || {};
+                        const url = config.video?.url;
+                        if (url && url.includes('.m3u8')) {
+                            handleMedia({ url, source: `DPlayer Polling` });
+                            return {};
+                        }
+                        return new OriginalDPlayer(...args);
+                    };
+                }
+            }, 500);
+        },
 
+        // 策略3: 原型链挂钩 (通用播放器)
+        hookViaPrototype() {
+            const playerKeywords = {"aliplayer": "AliPlayer", "TCPlayer": "TCPlayer"};
             const originalApply = Function.prototype.apply;
             Function.prototype.apply = function(context, args) {
-                if (!playerHooked && context && typeof context === 'function') {
+                if (!mediaFoundAndHandled && context?.toString) {
                     const funcString = context.toString();
                     for (const keyword in playerKeywords) {
                         if (funcString.includes(keyword)) {
-                            console.log(`%c[Core] Prototype-Hook SUCCESS! ${playerKeywords[keyword]} constructor found!`, 'color: lime; font-weight: bold;');
-                            const config = args && args[0] ? args[0] : null;
-                            const m3u8Url = extractSource(config);
-
-                            if (m3u8Url) {
-                                console.log(`[Core] Captured M3U8 from ${playerKeywords[keyword]} config: ${m3u8Url}`);
-                                Interceptor.dispatchMediaFoundEvent({ url: m3u8Url, source: `${playerKeywords[keyword]} ProtoHook` });
-                                return {}; // 禁用原始播放器
+                            const url = args[0]?.source;
+                            if (url && url.includes('.m3u8')) {
+                                handleMedia({ url, source: `${playerKeywords[keyword]} ProtoHook` });
+                                return {};
                             }
                         }
                     }
@@ -284,8 +261,42 @@
             };
         },
         
+        // 策略4: 网络和API嗅探 (最后保障)
+        hookNetworkAndAPIs() {
+            const originalFetch = window.fetch;
+            window.fetch = async (...args) => {
+                const request = new Request(args[0], args[1]);
+                if (!mediaFoundAndHandled && request.url.includes('.m3u8')) {
+                    try {
+                        const response = await originalFetch(request);
+                        if (response.ok) {
+                            const cloned = response.clone();
+                            cloned.text().then(body => handleMedia({ url: cloned.url, source: 'Fetch M3U8', responseText: body }));
+                        }
+                        return response;
+                    } catch(e) {}
+                }
+                return originalFetch(...args);
+            };
+
+            const originalCreateObjectURL = URL.createObjectURL;
+            window.URL.createObjectURL = (obj) => {
+                const url = originalCreateObjectURL(obj);
+                if (!mediaFoundAndHandled && (obj instanceof Blob) && (obj.type.startsWith('video/') || obj.type.includes('mpegurl'))) {
+                    handleMedia({ url, source: `Blob (${obj.type})`});
+                }
+                return url;
+            };
+        },
+
         activate() {
-            this.hookPlayers();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.scrapeKnownSites());
+            } else { this.scrapeKnownSites(); }
+            
+            this.startPlayerPolling();
+            this.hookViaPrototype();
+            this.hookNetworkAndAPIs();
         }
     };
 
