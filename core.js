@@ -1,21 +1,11 @@
-// core.js (最终混合动力配套版)
-// 版本: 8.0.0
-// 描述: 作为混合动力插件的核心，同时处理来自自身高级嗅探和来自Background底层嗅探的结果。
+// core.js (最终配套版 - v9.0.0)
+// 描述: 最终架构的核心逻辑，通过监听自定义DOM事件与插件UI交互。
 
 (function() {
     'use strict';
     
-    // 标志位由 background.js 设置，确保只执行一次
-    if (window.M3U8_PURIFIER_INJECTED_FLAG_V8_0_0) {
-        return;
-    }
-    window.M3U8_PURIFIER_INJECTED_FLAG_V8_0_0 = true;
-    
-    console.log('%c[M3U8 Purifier Core] v8.0.0 Executed! (Hybrid Power Edition)', 'color: #4169E1; font-size: 16px; font-weight: bold;');
+    console.log('%c[M3U8 Purifier Core] v9.0.0 Executed! (DNR Edition)', 'color: #32CD32; font-size: 16px; font-weight: bold;');
 
-    // =================================================================================
-    // 模块 1: 全局状态、常量与设置
-    // =================================================================================
     const SCRIPT_NAME = 'M3U8 净化平台';
     let isPlayerActive = false;
     let mediaFoundAndHandled = false;
@@ -26,9 +16,6 @@
         pip: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>`
     };
 
-    // =================================================================================
-    // 模块 2: 动态加载与注入
-    // =================================================================================
     function loadHlsJs() {
         return new Promise((resolve) => {
             if (typeof Hls !== 'undefined') return resolve();
@@ -57,9 +44,6 @@
         document.head.appendChild(style);
     }
     
-    // =================================================================================
-    // 模块 3: M3U8 处理逻辑
-    // =================================================================================
     function processM3U8(text, m3u8Url) {
         let lines = text.split('\n');
         try {
@@ -84,14 +68,9 @@
                 }
             }
             return finalLines.join('\n');
-        } catch (e) {
-            return text;
-        }
+        } catch (e) { return text; }
     }
 
-    // =================================================================================
-    // 模块 4: 播放器管理器
-    // =================================================================================
     const PlayerManager = {
         currentPlayerContainer: null,
         injectPlayer(mediaItem) {
@@ -169,16 +148,24 @@
         }
     };
     
-    // =================================================================================
-    // 模块 4.5: 设置面板UI管理器
-    // =================================================================================
     const SettingsPanel = {
         isOpen: false, panelElement: null,
         toggle() { this.isOpen ? this.close() : this.open(); },
         async open() {
             if (this.isOpen) return;
             this.isOpen = true;
-            localSettings = await new Promise(resolve => chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, r => resolve(r || {})));
+            
+            localSettings = await new Promise(resolve => {
+                document.dispatchEvent(new CustomEvent('__M3U8_PURIFIER_REQUEST__', { detail: { type: 'GET_SETTINGS' } }));
+                const listener = (event) => {
+                    if (event.detail.type === 'SETTINGS_DATA') {
+                        document.removeEventListener('__M3U8_PURIFIER_RESPONSE__', listener);
+                        resolve(event.detail.payload || {});
+                    }
+                };
+                document.addEventListener('__M3U8_PURIFIER_RESPONSE__', listener);
+            });
+
             this.panelElement = document.createElement('div');
             this.panelElement.style.cssText = `position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(8px); z-index: 2147483647; display: flex; align-items: center; justify-content: center; font-family: sans-serif;`;
             this.panelElement.innerHTML = `
@@ -199,12 +186,12 @@
                 </div>`;
             document.body.appendChild(this.panelElement);
             this.panelElement.querySelector('#purifier-close-settings').addEventListener('click', () => this.close());
-            this.panelElement.querySelector('#purifier-save-settings').addEventListener('click', async () => {
+            this.panelElement.querySelector('#purifier-save-settings').addEventListener('click', () => {
                 const settingsToSave = {
                     keywords: this.panelElement.querySelector('#purifier-keywords').value.split('\n').map(k => k.trim()).filter(Boolean),
                     autoPlay: this.panelElement.querySelector('#purifier-autoplay').checked
                 };
-                await new Promise(resolve => chrome.runtime.sendMessage({ type: 'SAVE_SETTINGS', payload: settingsToSave }, resolve));
+                document.dispatchEvent(new CustomEvent('__M3U8_PURIFIER_REQUEST__', { detail: { type: 'SAVE_SETTINGS', payload: settingsToSave } }));
                 localSettings = {...localSettings, ...settingsToSave};
                 alert('设置已保存！');
                 this.close();
@@ -218,74 +205,64 @@
         }
     };
     
-    // =================================================================================
-    // 模块 5: 主处理函数
-    // =================================================================================
     async function handleMedia(mediaItem) {
         if (window.self !== window.top || mediaFoundAndHandled) return;
         mediaFoundAndHandled = true;
-        
-        console.log(`%c[Core] Media captured by "${mediaItem.source}". Locking captures.`, 'color: violet; font-weight: bold;');
-        
-        if (localSettings.autoPlay === false) {
-             mediaFoundAndHandled = false;
-             return;
-        }
-        
+        if (localSettings.autoPlay === false) { mediaFoundAndHandled = false; return; }
         await loadHlsJs();
-        
-        if (mediaItem.source.includes('WebRequest') && !mediaItem.responseText) {
+        if (mediaItem.url.toLowerCase().includes('.m3u8') && !mediaItem.processedContent) {
             try {
                 const response = await fetch(mediaItem.url);
                 if(response.ok) mediaItem.responseText = await response.text();
             } catch(e) {}
-        }
-        
-        if (mediaItem.url.toLowerCase().includes('.m3u8') && mediaItem.responseText) {
-            mediaItem.processedContent = processM3U8(mediaItem.responseText, mediaItem.url);
+            if(mediaItem.responseText) mediaItem.processedContent = processM3U8(mediaItem.responseText, mediaItem.url);
         }
         PlayerManager.injectPlayer(mediaItem);
     }
 
-    // =================================================================================
-    // 模块 6: 终极嗅探器 Interceptor
-    // =================================================================================
     const Interceptor = {
-        activate() {
-            // 这个版本的 core.js 不再需要自己的高级嗅探器，
-            // 因为 background.js 的 WebRequest 已经足够强大和可靠。
-            // 这样做可以使 core.js 更轻量，并避免与 WebRequest 冲突。
-            console.log('[Core] Interceptor activated, relying on Background WebRequest.');
-        }
+        activate() { /* 在这个最终版本中，我们依赖 background.js 的 WebRequest，core.js 无需主动嗅探 */ }
     };
 
-    // =================================================================================
-    // 模块 7: 启动入口
-    // =================================================================================
     async function initialize() {
-        localSettings = await new Promise(resolve => {
-            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
-                chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, r => resolve(r || {}));
-            } else {
-                resolve({});
+        // injector.js 与 background.js 之间的通信，用于读写设置
+        document.addEventListener('__M3U8_PURIFIER_REQUEST__', (event) => {
+            if (chrome.runtime && chrome.runtime.sendMessage) {
+                chrome.runtime.sendMessage(event.detail, (response) => {
+                    document.dispatchEvent(new CustomEvent('__M3U8_PURIFIER_RESPONSE__', {
+                        detail: { type: 'SETTINGS_DATA', payload: response }
+                    }));
+                });
             }
         });
         
+        localSettings = await new Promise(resolve => {
+            document.dispatchEvent(new CustomEvent('__M3U8_PURIFIER_REQUEST__', { detail: { type: 'GET_SETTINGS' } }));
+            const listener = (event) => {
+                if(event.detail.type === 'SETTINGS_DATA') {
+                    document.removeEventListener('__M3U8_PURIFIER_RESPONSE__', listener);
+                    resolve(event.detail.payload || {});
+                }
+            };
+            document.addEventListener('__M3U8_PURIFIER_RESPONSE__', listener);
+        });
+
         injectStyles();
         Interceptor.activate();
+        
+        document.addEventListener('__M3U8_PURIFIER_CMD__', (event) => {
+            if (event.detail?.type === 'TOGGLE_SETTINGS_PANEL' && window.self === window.top) {
+                SettingsPanel.toggle();
+            }
+        });
 
-        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
-            chrome.runtime.onMessage.addListener((message) => {
-                if (message.type === 'TOGGLE_SETTINGS_PANEL' && window.self === window.top) {
-                    SettingsPanel.toggle();
-                }
-                if (message.type === 'BACKGROUND_MEDIA_FOUND') {
-                    handleMedia(message.payload);
-                }
-            });
-        }
+        // 监听来自 background.js WebRequest 的嗅探结果
+        chrome.runtime.onMessage.addListener((message) => {
+            if (message.type === 'BACKGROUND_MEDIA_FOUND') {
+                handleMedia(message.payload);
+            }
+        });
     }
     
     initialize();
-
 })();
