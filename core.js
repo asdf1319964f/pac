@@ -1,17 +1,17 @@
-// core.js (终极整合版 - 多层嗅探协同作战)
-// 版本: 2.0.0
-// 描述: 集成定点抓取、轮询挂钩、原型链挂钩、网络嗅探等多种技术，形成全方位、高鲁棒性的媒体嗅探核心。
+// core.js (最终决战版 - DOM扫描 + 多层嗅探)
+// 版本: 2.1.0
+// 描述: 新增 DOM <script> 标签扫描功能，直接通过正则表达式从初始化代码中提取播放器配置，作为终极解决方案。
 
 (function() {
     'use strict';
     
     // 使用带版本的标志位，确保每次更新都能重新注入
-    if (window.M3U8_PURIFIER_CORE_LOADED_V2_0_0) {
+    if (window.M3U8_PURIFIER_CORE_LOADED_V2_1_0) {
         return;
     }
-    window.M3U8_PURIFIER_CORE_LOADED_V2_0_0 = true;
+    window.M3U8_PURIFIER_CORE_LOADED_V2_1_0 = true;
 
-    console.log('%c[M3U8 Purifier Core] v2.0.0 Executed! (Ultimate Edition)', 'color: gold; font-size: 16px; font-weight: bold;');
+    console.log('%c[M3U8 Purifier Core] v2.1.0 Executed! (DOM Scan Edition)', 'color: red; font-size: 16px; font-weight: bold;');
 
     // =================================================================================
     // 模块 1: 全局状态、常量与设置
@@ -22,9 +22,7 @@
 
     const settings = {
         m3u8_keywords: ['toutiao', 'qiyi', '/ad', '-ad-', '_ad_'],
-        m3u8_smart_slice: true,
         m3u8_auto_play: true,
-        m3u8_playback_rate: 1.0,
         m3u8_floating_pos: { left: '100px', top: '100px', width: '60vw', height: 'auto' }
     };
     
@@ -197,53 +195,61 @@
     // =================================================================================
     const Interceptor = {
         
-        // 策略1: 定点数据抓取 (最高优先级)
-        scrapeKnownSites() {
-            if (window.location.hostname.includes('reddit.com')) {
-                try {
-                    const dataScript = document.querySelector('script#data');
-                    if (!dataScript?.textContent) return;
-                    const jsonString = dataScript.textContent.substring(dataScript.textContent.indexOf('{'));
-                    const jsonData = JSON.parse(jsonString);
-                    if (jsonData?.posts?.models) {
-                        for (const key in jsonData.posts.models) {
-                            const post = jsonData.posts.models[key];
-                            if (post?.media?.is_video && post.media.hls_url) {
-                                handleMedia({ url: post.media.hls_url, source: 'Reddit Pre-load' });
+        // 策略1: DOM扫描器 (最高优先级)
+        scanDOMForPlayerConfig() {
+            if (mediaFoundAndHandled) return;
+            const scripts = document.querySelectorAll('script');
+            const regex = /new\s+DPlayer\s*\(([\s\S]*?\{[\s\S]*?url[\s\S]*?\.m3u8[\s\S]*?})\s*\)/;
+
+            for (const script of scripts) {
+                if (script.textContent) {
+                    const match = script.textContent.match(regex);
+                    if (match && match[1]) {
+                        console.log('%c[Core] DOM Scan SUCCESS! Found DPlayer config in a <script> tag.', 'color: blue; font-weight: bold;');
+                        try {
+                            // 使用更安全的方式解析可能不标准的JSON
+                            const configStr = match[1].replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":');
+                            const config = JSON.parse(configStr);
+                            const url = config.video?.url;
+                            if (url) {
+                                handleMedia({ url: url, source: 'DOM Scan (DPlayer)' });
                                 return;
                             }
+                        } catch (e) {
+                           // 如果JSON解析失败，尝试用正则直接提取URL
+                           const urlMatch = match[1].match(/url\s*:\s*['"](http[^'"]+\.m3u8[^'"]*)['"]/);
+                           if(urlMatch && urlMatch[1]){
+                               handleMedia({ url: urlMatch[1], source: 'DOM Scan (DPlayer Regex)' });
+                               return;
+                           }
                         }
                     }
-                } catch (e) {}
+                }
             }
         },
 
         // 策略2: 轮询挂钩 (应对反调试)
         startPlayerPolling() {
             let attempts = 0;
-            const maxAttempts = 20; // 最多轮询10秒
             const interval = setInterval(() => {
-                if (mediaFoundAndHandled || attempts++ > maxAttempts) {
-                    clearInterval(interval);
-                    return;
+                if (mediaFoundAndHandled || attempts++ > 20) {
+                    clearInterval(interval); return;
                 }
-                // 轮询 DPlayer
                 if (typeof window.DPlayer === 'function') {
                     clearInterval(interval);
                     const OriginalDPlayer = window.DPlayer;
                     window.DPlayer = function(...args) {
-                        const config = args[0] || {};
-                        const url = config.video?.url;
+                        const url = args[0]?.video?.url;
                         if (url && url.includes('.m3u8')) {
                             handleMedia({ url, source: `DPlayer Polling` });
                             return {};
                         }
                         return new OriginalDPlayer(...args);
-};
+                    };
                 }
             }, 500);
         },
-
+        
         // 策略3: 网络和API嗅探 (最后保障)
         hookNetworkAndAPIs() {
             const originalFetch = window.fetch;
@@ -261,21 +267,15 @@
                 }
                 return originalFetch(...args);
             };
-
-            const originalCreateObjectURL = URL.createObjectURL;
-            window.URL.createObjectURL = (obj) => {
-                const url = originalCreateObjectURL(obj);
-                if (!mediaFoundAndHandled && (obj instanceof Blob) && (obj.type.startsWith('video/') || obj.type.includes('mpegurl'))) {
-                    handleMedia({ url, source: `Blob (${obj.type})`});
-                }
-                return url;
-            };
         },
 
         activate() {
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => this.scrapeKnownSites());
-            } else { this.scrapeKnownSites(); }
+            // 在页面完全加载后执行扫描，确保所有脚本都已在DOM中
+            if (document.readyState === 'complete') {
+                this.scanDOMForPlayerConfig();
+            } else {
+                window.addEventListener('load', () => this.scanDOMForPlayerConfig(), { once: true });
+            }
             
             this.startPlayerPolling();
             this.hookNetworkAndAPIs();
