@@ -1,24 +1,35 @@
-// core.js (v4.1.0 - UI回归最终版)
-// 描述: 内置动态设置面板和M3U8分析器，通过 background 菜单触发。
+// core.js (生产最终版)
+// 版本: 5.1.0
+// 描述: 集成DOM扫描、轮询、网络嗅探等多种技术，并包含完整播放器UI和设置面板。
 
 (function() {
     'use strict';
     
-    if (window.M3U8_PURIFIER_INJECTED_FLAG_V4_1_0) return;
-    window.M3U8_PURIFIER_INJECTED_FLAG_V4_1_0 = true;
+    // 使用一个在 background.js 中定义的、独一无二的标志位
+    // 这个标志位由加载器脚本注入时设置，确保本文件只执行一次
+    // 示例: if (window.M3U8_PURIFIER_INJECTED_FLAG_FINAL_STRIKE) return;
+    // 为确保独立性，这里再加一道保险
+    if (window.M3U8_PURIFIER_CORE_EXECUTED_V5_1_0) return;
+    window.M3U8_PURIFIER_CORE_EXECUTED_V5_1_0 = true;
 
-    console.log('%c[M3U8 Purifier Core] v4.1.0 Executed! (UI Edition)', 'color: deepskyblue; font-size: 16px; font-weight: bold;');
+    console.log('%c[M3U8 Purifier Core] v5.1.0 (Production) Activated!', 'color: #1E90FF; font-size: 16px; font-weight: bold;');
 
+    // =================================================================================
+    // 模块 1: 全局状态、常量与设置
+    // =================================================================================
     const SCRIPT_NAME = 'M3U8 净化平台';
     let isPlayerActive = false;
-    let mediaFoundAndHandled = false;
-    let localSettings = {};
+    let mediaFoundAndHandled = false; // 全局锁，确保只处理一次
+    let localSettings = {}; // 用于缓存从background获取的设置
 
     const ICONS = {
         close: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
         pip: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>`
     };
 
+    // =================================================================================
+    // 模块 2: 动态加载与注入
+    // =================================================================================
     function loadHlsJs() {
         return new Promise((resolve) => {
             if (typeof Hls !== 'undefined') return resolve();
@@ -46,7 +57,10 @@
         style.appendChild(document.createTextNode(css));
         document.head.appendChild(style);
     }
-    
+
+    // =================================================================================
+    // 模块 3: M3U8 处理逻辑
+    // =================================================================================
     function processM3U8(text, m3u8Url) {
         let lines = text.split('\n');
         try {
@@ -76,6 +90,9 @@
         }
     }
 
+    // =================================================================================
+    // 模块 4: 播放器管理器
+    // =================================================================================
     const PlayerManager = {
         currentPlayerContainer: null,
         injectPlayer(mediaItem) {
@@ -199,14 +216,21 @@
         }
     };
 
+    // =================================================================================
+    // 模块 5: 主处理函数 (全局锁)
+    // =================================================================================
     async function handleMedia(mediaItem) {
         if (window.self !== window.top || mediaFoundAndHandled) return;
         mediaFoundAndHandled = true;
+        
         console.log(`%c[Core] Media captured by "${mediaItem.source}". Locking further captures.`, 'color: violet; font-weight: bold;');
+        
         if (localSettings.autoPlay === false) {
+             console.log('[Core] Autoplay is disabled.');
              mediaFoundAndHandled = false;
              return;
         }
+        
         await loadHlsJs();
         if (mediaItem.url.toLowerCase().includes('.m3u8') && mediaItem.responseText) {
             mediaItem.processedContent = processM3U8(mediaItem.responseText, mediaItem.url);
@@ -214,26 +238,104 @@
         PlayerManager.injectPlayer(mediaItem);
     }
 
+    // =================================================================================
+    // 模块 6: 终极嗅探器 Interceptor
+    // =================================================================================
     const Interceptor = {
-        scanDOMForPlayerConfig() { /* ... 完整的 scanDOMForPlayerConfig 函数 ... */ },
-        startPlayerPolling() { /* ... 完整的 startPlayerPolling 函数 ... */ },
-        hookNetworkAndAPIs() { /* ... 完整的 hookNetworkAndAPIs 函数 ... */ },
+        scanDOMForPlayerConfig() {
+            if (mediaFoundAndHandled) return;
+            const scripts = document.querySelectorAll('script');
+            const regex = /new\s+DPlayer\s*\(([\s\S]*?\{[\s\S]*?url[\s\S]*?\.m3u8[\s\S]*?})\s*\)/;
+            for (const script of scripts) {
+                if (script.textContent) {
+                    const match = script.textContent.match(regex);
+                    if (match && match[1]) {
+                        console.log('%c[Core] DOM Scan SUCCESS! Found DPlayer config.', 'color: blue; font-weight: bold;');
+                        try {
+                           const urlMatch = match[1].match(/url\s*:\s*['"](http[^'"]+\.m3u8[^'"]*)['"]/);
+                           if(urlMatch && urlMatch[1]){
+                               handleMedia({ url: urlMatch[1], source: 'DOM Scan (DPlayer Regex)' });
+                               return;
+                           }
+                        } catch (e) {}
+                    }
+                }
+            }
+        },
+        startPlayerPolling() {
+            let attempts = 0;
+            const interval = setInterval(() => {
+                if (mediaFoundAndHandled || attempts++ > 20) {
+                    clearInterval(interval); return;
+                }
+                if (typeof window.DPlayer === 'function') {
+                    clearInterval(interval);
+                    const OriginalDPlayer = window.DPlayer;
+                    window.DPlayer = function(...args) {
+                        const url = args[0]?.video?.url;
+                        if (url && url.includes('.m3u8')) {
+                            handleMedia({ url, source: `DPlayer Polling` });
+                            return {};
+                        }
+                        return new OriginalDPlayer(...args);
+                    };
+                }
+            }, 500);
+        },
+        hookNetworkAndAPIs() {
+            const originalFetch = window.fetch;
+            window.fetch = async (...args) => {
+                const request = new Request(args[0], args[1]);
+                if (!mediaFoundAndHandled && request.url.includes('.m3u8')) {
+                    try {
+                        const response = await originalFetch(request);
+                        if (response.ok) {
+                            const cloned = response.clone();
+                            cloned.text().then(body => handleMedia({ url: cloned.url, source: 'Fetch M3U8', responseText: body }));
+                        }
+                        return response;
+                    } catch(e) {}
+                }
+                return originalFetch(...args);
+            };
+        },
         activate() {
-            if (document.readyState === 'complete') this.scanDOMForPlayerConfig();
-            else window.addEventListener('load', () => this.scanDOMForPlayerConfig(), { once: true });
+            if (document.readyState === 'complete') {
+                this.scanDOMForPlayerConfig();
+            } else {
+                window.addEventListener('load', () => this.scanDOMForPlayerConfig(), { once: true });
+            }
             this.startPlayerPolling();
             this.hookNetworkAndAPIs();
         }
     };
 
+    // =================================================================================
+    // 模块 7: 启动入口
+    // =================================================================================
     async function initialize() {
-        localSettings = await new Promise(resolve => chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, r => resolve(r || {})));
+        // 从 background 获取初始设置
+        localSettings = await new Promise(resolve => {
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+                chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, r => resolve(r || { autoPlay: true, keywords: [] }));
+            } else {
+                resolve({ autoPlay: true, keywords: [] }); // 备用默认值
+            }
+        });
+
         injectStyles();
         Interceptor.activate();
-        chrome.runtime.onMessage.addListener((message) => {
-            if (message.type === 'TOGGLE_SETTINGS_PANEL' && window.self === window.top) SettingsPanel.toggle();
-        });
+
+        // 监听来自 background 的菜单命令
+        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+            chrome.runtime.onMessage.addListener((message) => {
+                if (message.type === 'TOGGLE_SETTINGS_PANEL' && window.self === window.top) {
+                    SettingsPanel.toggle();
+                }
+            });
+        }
     }
     
     initialize();
+
 })();
