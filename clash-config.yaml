@@ -256,12 +256,6 @@ rule-providers:
     interval: 86400
     type: http
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/tracker.mrs
-  anti_ad_china:
-    behavior: classical
-    format: yaml
-    interval: 86400
-    type: http
-    url: https://anti-ad.net/clash.yaml
   international_ads:
     behavior: domain
     format: mrs
@@ -1390,7 +1384,6 @@ proxy-groups:
     type: select
 rules:
   - RULE-SET,banAd_domain,🚫广告拦截
-  - RULE-SET,anti_ad_china,🚫广告拦截
   - RULE-SET,privacy_domain,🚫广告拦截
   - DOMAIN-KEYWORD,miaogongzi,国内分流
   - DOMAIN-KEYWORD,jfg,国内分流
