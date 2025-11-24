@@ -57,6 +57,7 @@ dns:
     - +.market.xiaomi.com
     - WORKGROUP
   fake-ip-filter-mode: blacklist
+  bind-address: '192.168.1.1'
   nameserver-policy:
     "+.jp":
       - https://public.dns.iij.jp/dns-query#h3=true
