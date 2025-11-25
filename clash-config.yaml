@@ -1407,6 +1407,7 @@ rules:
   - DOMAIN-KEYWORD,javdb,节点选择
   - DOMAIN-KEYWORD,manwa,节点选择
   - DOMAIN-KEYWORD,jmcomic,新加坡节点
+  - DOMAIN-SUFFIX,example.com,全球直连
   - RULE-SET,wechat_domain,国内分流
   - RULE-SET,wechat_asn,国内分流,no-resolve
   - RULE-SET,speedtest_domain,Speedtest
