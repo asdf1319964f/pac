@@ -685,6 +685,11 @@ rule-providers:
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs
 
 proxy-groups:
+  - name: "全球直连"
+    type: select
+    proxies:
+      - DIRECT
+      - "🚀 节点选择"
   - exclude-filter: (?=.*(?i)(The_TW_balance|wcloud|0倍|0\.1倍|0\.01倍|0\.3X|0\.2x|0\.5x|3X|2x|1\.5x|traffic|plus))
     filter: "(?i)(台|TW|Taiwan|\U0001F1F9\U0001F1FC)"
     hidden: true
