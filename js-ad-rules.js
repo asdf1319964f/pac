@@ -12,7 +12,13 @@
       "ad",
       "mda",
       "notice",
-      "uni-swiper-slides"
+      "uni-swiper-slides",
+      "fixed",
+      "float",
+      "pop",
+      "popup",
+      "ad-box",
+      "ad-container"
     ],
     "selectors": [
       "ads",
@@ -20,14 +26,19 @@
       "div[style=\"opacity: 1;\"]",
       "div[style=\"z-index: 2001;\"]",
       "i.icon.iconfont.icon-account",
-      "iframe[style=\"position: absolute; display: block; left: 50%; top: 50%; width: 300px; height: 146px; margin: -73px 0px 0px -150px;\"]",
-      "uni-view.tabbar-list"
+      "iframe[style*=\"position: absolute\"][style*=\"width: 300px\"]",
+      "uni-view.tabbar-list",
+      "div[style*='position: fixed'][style*='bottom: 0']",
+      "div[class*='adv-wrap']",
+      "div[class*='gdt-']"
     ],
     "idsToHide": [
       "__clb-spot_2090934_fxi_1",
       "__clb-spot_2090934_mzi_1",
       "rm-float3",
-      "啊路"
+      "啊路",
+      "ad_pop",
+      "float-ad-box"
     ],
     "interval": 600
   },
@@ -50,10 +61,15 @@
       "mda",
       "notice",
       "van-overlay",
-      "van-popup"
+      "van-popup",
+      "bottom-ad-fixed",
+      "float-icon"
     ],
     "selectors": [
-      "span[style=\"color: gold\"]"
+      "span[style=\"color: gold\"]",
+      "div[class*=\"footer-ad\"]",
+      "div[class*=\"bottom-bar\"]:has(a[href*=\"ad\"])",
+      "div[style*=\"position: fixed\"][style*=\"bottom: 0\"][style*=\"height: 50px\"]"
     ],
     "idsToHide": [],
     "interval": 3000
