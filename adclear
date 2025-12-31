@@ -46,7 +46,7 @@
 			"16.0599",
 			"15.1666",
 			"15.2666",
-            "#EXTINF.*?\\s+.*?50DF5ql.*?\\.ts\\s+"
+            "#EXTINF.*?\\s+.*?50DF5ql.*?\\.ts\\s+",
 			"#EXTINF.*?\\s+.*?FNnARAy.*?\\.ts\\s+",
 			"#EXT-X-KEY:METHOD=NONE\\r*\\n*#EXTINF:1.28,[\\s\\S]*?#EXT-X-DISCONTINUITY",
 			"#EXT-X-DISCONTINUITY\\r*\\n*#EXTINF:6.666667,[\\s\\S]*?#EXT-X-DISCONTINUITY",
