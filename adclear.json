@@ -2,6 +2,7 @@
 	{
 		"hosts":[
 			"155bf",
+		    "slv525627",
 			"v155p",
 			"155gg",
 			"hwzcfz",
@@ -85,6 +86,7 @@
 			"#EXTINF.*?\\s+.*?adjump.*?\\.ts\\s+",
 			"#EXTINF.*?\\s+.*?p1ayer.*?\\.ts\\s+",
 			"#EXTINF.*?\\s+.*headers.*?\\header.ts",
+		    "#EXTINF.*?\\s+.*?yHyaGer.*?\\.ts",
 			"#EXTINF.*?\\s+.*?1o.*?\\.ts\\s+"
 		]
 	}
