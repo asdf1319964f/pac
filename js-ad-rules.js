@@ -1,15 +1,14 @@
 // ==UserScript==
-// @name         M3U8 广告净化器 (V2.0 核弹版)
+// @name         M3U8 广告净化器 (V5.0 原生注入版)
 // @namespace    http://tampermonkey.net/
-// @version      2.0
-// @description  底层劫持 XHR/Fetch，基于 GitHub 规则实时净化 M3U8 流
+// @version      5.0
+// @description  利用 Script Injection 技术突破沙盒和 Iframe 限制，原生级拦截广告
 // @author       TeaTea & You
 // @match        *://*/*
+// @run-at       document-start
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @grant        unsafeWindow
-// @run-at       document-start
 // @connect      raw.githubusercontent.com
 // ==/UserScript==
 
@@ -17,236 +16,195 @@
     'use strict';
 
     // ================= 配置区域 =================
-    // 【必填】请替换为你 GitHub 文件的 Raw 地址
-    const RULES_URL = "https://raw.githubusercontent.com/你的用户名/你的仓库/main/rules.json";
+    const RULES_URL = "https://raw.githubusercontent.com/asdf1319964f/pac/refs/heads/master/adclear.json";
     // ===========================================
 
-    // 日志样式
-    const LOG_PREFIX = `%c[M3U8净化]`;
-    const STYLE_INFO = 'color: #00ffff; background: #333; padding: 2px 4px; border-radius: 3px;';
-    const STYLE_SUCCESS = 'color: #00ff00; background: #333; padding: 2px 4px; border-radius: 3px; font-weight: bold;';
-    const STYLE_WARN = 'color: #ffff00; background: #333; padding: 2px 4px; border-radius: 3px;';
+    // 1. 在油猴沙盒层：负责获取和缓存规则
+    // 因为网页层(Injected)无法跨域请求 GitHub，必须由油猴层代劳
+    async function syncRules() {
+        const cachedRules = GM_getValue('injected_rules', []);
 
-    let COMPILED_REGEX = []; // 编译好的正则库
-    let IS_INTERCEPTOR_ACTIVE = false;
-
-    // 1. 初始化：加载规则
-    async function init() {
-        // 先尝试读取缓存，为了速度
-        const cachedRules = GM_getValue('cached_regex_strings', []);
-        if (cachedRules.length > 0) {
-            compileRegex(cachedRules);
-            console.log(LOG_PREFIX, STYLE_INFO, `载入本地缓存规则 ${cachedRules.length} 条`);
-        }
-
-        // 异步更新规则
+        // 每次页面加载都尝试后台更新规则
         GM_xmlhttpRequest({
             method: "GET",
-            url: RULES_URL + "?t=" + Date.now(), // 防止 GitHub 缓存
+            url: RULES_URL + "?t=" + Date.now(),
             onload: function(response) {
                 if (response.status === 200) {
                     try {
                         const rules = JSON.parse(response.responseText);
-                        processRules(rules);
-                    } catch (e) {
-                        console.error("规则解析失败", e);
+                        GM_setValue('injected_rules', rules); // 更新缓存
+                    } catch (e) {}
+                }
+            }
+        });
+
+        return cachedRules;
+    }
+
+    // 2. 注入核心：这是真正运行在网页上下文的代码
+    // 它可以无视 Tampermonkey 的限制，直接修改原生对象
+    function injectedCore(rulesData) {
+        const LOG_PREFIX = `[M3U8净化]`;
+        let COMPILED_REGEX = [];
+
+        // --- 内部工具：编译正则 ---
+        function compileRegex(rules) {
+            let patterns = [];
+            try {
+                // 简单粗暴：不分 Hosts，只要有规则就全部加载
+                // 这样能保证在 iframe 里（域名可能变了）也能生效
+                rules.forEach(group => {
+                    patterns = patterns.concat(group.regex);
+                });
+                patterns = [...new Set(patterns)]; // 去重
+                return patterns.map(str => {
+                    try { return new RegExp(str, 'gm'); } catch(e){ return null; }
+                }).filter(r => r);
+            } catch(e) { return []; }
+        }
+
+        COMPILED_REGEX = compileRegex(rulesData);
+        if (COMPILED_REGEX.length === 0) return;
+
+        console.log(LOG_PREFIX, "💉 原生拦截核已植入", window.location.href);
+
+        // --- 内部工具：净化逻辑 ---
+        function purify(content, url) {
+            if (!content || typeof content !== 'string' || !content.includes('#EXTINF')) return content;
+
+            let result = content;
+            let dropped = 0;
+
+            // 暴力全替换
+            for (let regex of COMPILED_REGEX) {
+                if (regex.source.includes('#EXT')) {
+                    const matches = result.match(regex);
+                    if (matches) {
+                        dropped += matches.length;
+                        result = result.replace(regex, '');
                     }
                 }
             }
-        });
-    }
 
-    // 2. 规则预处理：匹配当前环境
-    function processRules(rulesData) {
-        const currentUrl = window.location.href;
-        let activeRegexStrings = [];
+            // 切片粉碎
+            const lines = result.split('\n');
+            const final = [];
+            let buffer = [];
 
-        rulesData.forEach(group => {
-            // 检查 hosts：只要当前 URL 包含 hosts 里的任意关键词，就启用该组规则
-            // 支持归纳法：比如 "155" 可以匹配 "v155.com"
-            const isMatch = group.hosts.some(h => currentUrl.includes(h) || h === "*");
-            
-            if (isMatch) {
-                console.log(LOG_PREFIX, STYLE_INFO, `命中规则组: ${group.name}`);
-                activeRegexStrings = activeRegexStrings.concat(group.regex);
-            }
-        });
-
-        // 去重
-        activeRegexStrings = [...new Set(activeRegexStrings)];
-        
-        // 缓存并编译
-        GM_setValue('cached_regex_strings', activeRegexStrings);
-        compileRegex(activeRegexStrings);
-    }
-
-    function compileRegex(regexStrings) {
-        COMPILED_REGEX = regexStrings.map(str => {
-            try {
-                return new RegExp(str);
-            } catch (e) {
-                console.warn("无效正则:", str);
-                return null;
-            }
-        }).filter(r => r !== null);
-
-        // 如果有规则，且拦截器还没启动，就启动
-        if (COMPILED_REGEX.length > 0 && !IS_INTERCEPTOR_ACTIVE) {
-            startInterceptor();
-            IS_INTERCEPTOR_ACTIVE = true;
-            console.log(LOG_PREFIX, STYLE_SUCCESS, `拦截器已启动，监控中...`);
-        }
-    }
-
-    // 3. 核心净化逻辑
-    function purifyM3U8(content, url) {
-        // 快速检查：如果内容里没有 EXTINF，可能不是 m3u8，直接返回
-        if (!content.includes('#EXTINF')) return content;
-
-        const lines = content.split('\n');
-        const newLines = [];
-        let droppedCount = 0;
-        let blockedBy = "";
-
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i].trim();
-            let shouldBlock = false;
-
-            // 扫描正则库
-            for (let regex of COMPILED_REGEX) {
-                if (regex.test(line)) {
-                    shouldBlock = true;
-                    blockedBy = regex.toString();
-                    break;
+            for (let line of lines) {
+                line = line.trim();
+                if (line.startsWith('#EXTINF')) {
+                    if (buffer.length) final.push(...checkBuf(buffer));
+                    buffer = [line];
+                } else if (buffer.length) {
+                    buffer.push(line);
+                    if (!line.startsWith('#') && line.length > 0) {
+                        final.push(...checkBuf(buffer));
+                        buffer = [];
+                    }
+                } else {
+                    final.push(line);
                 }
             }
+            if (buffer.length) final.push(...checkBuf(buffer));
 
-            if (shouldBlock) {
-                droppedCount++;
-                // 激进模式：如果你删了一行 EXTINF，通常下一行就是 URL，大部分广告的特征在 EXTINF 上
-                // 但你的正则里有针对 URL 的特征（.ts），也有针对 EXTINF 的特征
-                // 所以这里直接删掉命中行即可。
-                // 如果是 #EXTINF 行被删，播放器会自动忽略下一行孤立的 URL 吗？
-                // 为了保险，如果当前行被删且是 #EXTINF，我们标记跳过下一行？
-                // 你的正则很多是针对 "两行组合" 的 (#EXT... \r\n #EXT...)，这种在 split 后会被打断
-                // ⚠️ 注意：你的正则包含 \r\n，这意味着必须对【全文】进行匹配，而不是逐行匹配！
-                continue; 
+            result = final.join('\n');
+
+            if (dropped > 0 || result.length < content.length) {
+                console.log(LOG_PREFIX, `⚔️ 拦截成功! 所在窗口: ${window.self === window.top ? '主页' : 'Iframe'}`);
             }
-            newLines.push(lines[i]);
+            return result;
         }
-        
-        // ⚠️ 针对多行正则的特殊处理：
-        // 因为你的正则里有 "\r\n"，这在 split('\n') 后就失效了。
-        // 所以我们需要先用全文正则替换，再做逐行清洗。
-        let processedContent = content;
-        
-        // A. 全文正则替换 (处理跨行特征，如 #EXT-X-DISCONTINUITY...#EXTINF...)
-        for (let regex of COMPILED_REGEX) {
-            // 检查正则是否包含换行符特征
-            if (regex.source.includes('\\n') || regex.source.includes('\\r')) {
-                 const matchCount = (processedContent.match(regex) || []).length;
-                 if (matchCount > 0) {
-                     // 将匹配到的广告块替换为空
-                     processedContent = processedContent.replace(regex, '');
-                     droppedCount += matchCount;
-                 }
+
+        function checkBuf(buf) {
+            const txt = buf.join('\n');
+            for (let r of COMPILED_REGEX) {
+                if (!r.source.includes('#EXT') && r.test(txt)) return [];
             }
+            return buf;
         }
 
-        // 如果全文替换已经生效，就不需要上面的逐行扫描了？
-        // 实际上建议结合。先做全文大块删除，剩下的再行处理。
-        // 为简化逻辑，这里直接返回全文替换后的结果。
-        
-        if (droppedCount > 0) {
-            console.log(LOG_PREFIX, STYLE_SUCCESS, `成功拦截 ${droppedCount} 个广告片段 | 来源: ${url.slice(-30)}`);
-        }
+        // --- 核心：劫持 XHR (原生级) ---
+        // 我们不修改 prototype，直接代理全局构造函数
+        // 这样网站的防篡改机制检查 prototype 时会发现它是完好的
+        const RealXHR = window.XMLHttpRequest;
 
-        return processedContent;
-    }
+        window.XMLHttpRequest = function() {
+            const xhr = new RealXHR();
+            const open = xhr.open;
 
-    // 4. 底层拦截器 (Proxy 方案)
-    function startInterceptor() {
-        
-        // --- 劫持 Fetch ---
-        const originalFetch = unsafeWindow.fetch;
-        unsafeWindow.fetch = async function(...args) {
-            const response = await originalFetch(...args);
+            xhr.open = function(method, url) {
+                this._url = url || '';
+                return open.apply(this, arguments);
+            };
+
+            // 监听状态变化，直接覆盖 responseText
+            // 这是最底层的方法，比 getter 劫持更暴力
+            xhr.addEventListener('readystatechange', function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const url = this._url || this.responseURL;
+                    if (url && url.includes('.m3u8')) {
+                        // 尝试获取原生响应
+                        // 注意：这里需要 try-catch，因为某些 xhr 配置可能不允许读取文本
+                        try {
+                            const originalText = xhr.responseText; // 触发一次原生读取
+                            if (originalText) {
+                                const cleanText = purify(originalText, url);
+                                // 强制覆写
+                                Object.defineProperty(xhr, 'responseText', { value: cleanText, writable: true });
+                                Object.defineProperty(xhr, 'response', { value: cleanText, writable: true });
+                            }
+                        } catch(e) {}
+                    }
+                }
+            });
+
+            return xhr;
+        };
+        // 保持原型链完整，欺骗反调试脚本
+        window.XMLHttpRequest.prototype = RealXHR.prototype;
+        Object.keys(RealXHR).forEach(k => window.XMLHttpRequest[k] = RealXHR[k]);
+
+
+        // --- 核心：劫持 Fetch (原生级) ---
+        const RealFetch = window.fetch;
+        window.fetch = async function(...args) {
+            const response = await RealFetch(...args);
             const url = response.url;
-
-            // 只处理 m3u8
-            if (url.indexOf('.m3u8') !== -1) {
+            if (url && url.includes('.m3u8')) {
                 try {
                     const clone = response.clone();
                     let text = await clone.text();
-                    
-                    // 净化
-                    text = purifyM3U8(text, url);
-                    
-                    // 构造新响应
+                    text = purify(text, url);
                     return new Response(text, {
                         status: response.status,
                         statusText: response.statusText,
                         headers: response.headers
                     });
-                } catch (e) {
-                    console.error("Fetch 净化出错", e);
-                    return response;
-                }
+                } catch(e) { return response; }
             }
             return response;
         };
-
-        // --- 劫持 XHR (针对 Hls.js) ---
-        const originalOpen = unsafeWindow.XMLHttpRequest.prototype.open;
-        const originalSend = unsafeWindow.XMLHttpRequest.prototype.send;
-
-        unsafeWindow.XMLHttpRequest.prototype.open = function(method, url) {
-            this._url = url;
-            return originalOpen.apply(this, arguments);
-        };
-
-        unsafeWindow.XMLHttpRequest.prototype.send = function() {
-            // 只有是 m3u8 请求才挂载拦截器
-            if (this._url && this._url.indexOf('.m3u8') !== -1) {
-                const xhr = this;
-                
-                // 劫持 onload，因为 responseText 是只读的，我们需要在用户代码读取前修改它
-                // 使用 Object.defineProperty 强制覆盖 responseText 属性
-                const originalOnReadyStateChange = xhr.onreadystatechange;
-                const originalOnLoad = xhr.onload;
-
-                const hook = () => {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        try {
-                            let text = xhr.responseText;
-                            if (text) {
-                                const newText = purifyM3U8(text, xhr._url);
-                                
-                                // 强制覆写 responseText
-                                Object.defineProperty(xhr, 'responseText', { value: newText });
-                                Object.defineProperty(xhr, 'response', { value: newText });
-                            }
-                        } catch (e) {
-                            console.error("XHR 净化出错", e);
-                        }
-                    }
-                };
-
-                // 注入 hook
-                if (originalOnReadyStateChange) {
-                    xhr.onreadystatechange = function() {
-                        hook();
-                        return originalOnReadyStateChange.apply(this, arguments);
-                    };
-                } else {
-                    xhr.addEventListener('readystatechange', hook);
-                }
-            }
-            return originalSend.apply(this, arguments);
-        };
     }
 
-    // 启动
-    init();
+    // 3. 执行逻辑
+    async function main() {
+        // 1. 先准备规则
+        const rules = await syncRules();
+
+        // 2. 将规则数据序列化
+        const rulesStr = JSON.stringify(rules);
+
+        // 3. 构造注入脚本
+        // 我们把 injectedCore 函数转成字符串，塞到页面里去执行
+        const script = document.createElement('script');
+        script.textContent = `(${injectedCore.toString()})(${rulesStr});`;
+
+        // 4. 插入页面 (立即执行)
+        (document.head || document.documentElement).appendChild(script);
+        script.remove(); // 执行完拔屌无情，移除标签防止被检测
+    }
+
+    main();
 
 })();
