@@ -25,7 +25,7 @@
 			"bfikuncdn",
 			"bfaskcdn",
 			"kuaikan"
-		],
+		]
 		"name":"全局合并去广告",
 		"regex":[
 			"25.1",
@@ -46,14 +46,14 @@
 			"16.0599",
 			"15.1666",
 			"15.2666",
-			"#EXTINF.*?\\s+.*?FNnARAy.*?\\.ts\\s+",
-			"#EXT-X-KEY:METHOD=NONE\\r*\\n*#EXTINF:1.28,[\\s\\S]*?#EXT-X-DISCONTINUITY",
+			"#EXT-X-KEY:METHOD=NONE\\r*\\n*#EXTINF:1.28,[\\s\\S]*?#EXT-X-DISCNTINUITY",
 			"#EXT-X-DISCONTINUITY\\r*\\n*#EXTINF:6.666667,[\\s\\S]*?#EXT-X-DISCONTINUITY",
 			"#EXT-X-DISCONTINUITY\\r*\\n*#EXTINF:6.600000,[\\s\\S]*?#EXT-X-DISCONTINUITY",
 			"#EXT-X-DISCONTINUITY\\r*\\n*#EXTINF:7.166667,[\\s\\S]*?#EXT-X-DISCONTINUITY",
 			"#EXT-X-DISCONTINUITY\\r*\\n*#EXTINF:4.066667,[\\s\\S]*?#EXT-X-DISCONTINUITY",
 			"#EXT-X-DISCONTINUITY\\r*\\n*#EXTINF:6.400000,[\\s\\S]*?#EXT-X-DISCONTINUITY",
 			"#EXTINF.*?\\s+.*?5ql.*?\\.ts\\s+",
+            "#EXTINF.*?\\s+.*?FNnARAy.*?\\.ts\\s+",
 			"#EXTINF.*?\\s+.*?EkK0k29J.*?\\.ts\\s+",
 			"#EXTINF.*?\\s+.*?1o.*?\\.ts\\s+",
 			"#EXTINF.*?\\s+.*?11697777.*?\\.ts\\s+",
