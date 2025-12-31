@@ -25,7 +25,7 @@
 			"bfikuncdn",
 			"bfaskcdn",
 			"kuaikan"
-		]
+		],
 		"name":"全局合并去广告",
 		"regex":[
 			"25.1",
@@ -46,7 +46,7 @@
 			"16.0599",
 			"15.1666",
 			"15.2666",
-			"#EXT-X-KEY:METHOD=NONE\\r*\\n*#EXTINF:1.28,[\\s\\S]*?#EXT-X-DISCNTINUITY",
+			"#EXT-X-KEY:METHOD=NONE\\r*\\n*#EXTINF:1.28,[\\s\\S]*?#EXT-X-DISCONTINUITY",
 			"#EXT-X-DISCONTINUITY\\r*\\n*#EXTINF:6.666667,[\\s\\S]*?#EXT-X-DISCONTINUITY",
 			"#EXT-X-DISCONTINUITY\\r*\\n*#EXTINF:6.600000,[\\s\\S]*?#EXT-X-DISCONTINUITY",
 			"#EXT-X-DISCONTINUITY\\r*\\n*#EXTINF:7.166667,[\\s\\S]*?#EXT-X-DISCONTINUITY",
