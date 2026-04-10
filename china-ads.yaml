@@ -1,0 +1,100 @@
+payload:
+  # ===== Tencent / 微信广告 =====
+  - DOMAIN-SUFFIX,egame.qq.com
+  - DOMAIN-SUFFIX,now.qq.com
+  - DOMAIN-SUFFIX,jspcdn.cn
+  - DOMAIN-SUFFIX,ams.tencentcloudapi.com
+  - DOMAIN-SUFFIX,api.dmp.qq.com
+  - DOMAIN-SUFFIX,api.adx.qq.com
+  - DOMAIN-SUFFIX,api.ams.qq.com
+  - DOMAIN-SUFFIX,ad.tencentcloudapi.com
+  - DOMAIN-SUFFIX,api.dsp.qq.com
+  - DOMAIN-SUFFIX,gdt.tencentcloudapi.com
+  - DOMAIN-SUFFIX,ad.wechat.com
+  - DOMAIN-SUFFIX,ad.servicewechat.com
+  - DOMAIN-SUFFIX,ad.tencent-cloud.com
+  - DOMAIN-SUFFIX,wxad.dev.qq.com
+  - DOMAIN-SUFFIX,wxad.preview.qq.com
+  - DOMAIN-SUFFIX,wxad.beta.qq.com
+  - DOMAIN-SUFFIX,ad.wechatapp.com
+  - DOMAIN-SUFFIX,e.tencentads.com
+  - DOMAIN-SUFFIX,ad.myqcloud.com
+  - DOMAIN-SUFFIX,ad.wechat.com.cn
+  - DOMAIN-SUFFIX,ad.wxapp.com
+  - DOMAIN-SUFFIX,gdt.myqcloud.com
+  - DOMAIN-SUFFIX,ad.wechatads.com
+  - DOMAIN-SUFFIX,ad.tencentcloud.com
+  - DOMAIN-SUFFIX,gdt.tc.qq.com
+  - DOMAIN-SUFFIX,e.tencent.com
+  - DOMAIN-SUFFIX,gdt.tencent-cloud.com
+  - DOMAIN-SUFFIX,tencentmind.com
+  - DOMAIN-SUFFIX,tracking.wechat.com
+
+  # ===== QQ Ads =====
+  - DOMAIN-SUFFIX,adx.qq.com
+  - DOMAIN-SUFFIX,adv.qq.com
+  - DOMAIN-SUFFIX,ad.qq.com
+  - DOMAIN-SUFFIX,ads.qq.com
+  - DOMAIN-SUFFIX,adnet.qq.com
+  - DOMAIN-SUFFIX,ad.video.qq.com
+  - DOMAIN-SUFFIX,ad.browser.qq.com
+  - DOMAIN-SUFFIX,ad.qzone.qq.com
+  - DOMAIN-SUFFIX,advertising.qq.com
+  - DOMAIN-SUFFIX,advertisement.qq.com
+  - DOMAIN-SUFFIX,omgmta.qq.com
+  - DOMAIN-SUFFIX,ad.mail.qq.com
+
+  # ===== GDT / 广点通 =====
+  - DOMAIN-SUFFIX,gdt.gtimg.com
+  - DOMAIN-SUFFIX,gdt.mail.qq.com
+  - DOMAIN-SUFFIX,gdt.ugdtimg.com
+  - DOMAIN-SUFFIX,gdt.gtimg.cn
+  - DOMAIN-SUFFIX,gdt.video.qq.com
+  - DOMAIN-SUFFIX,gdt.tencentmusic.com
+  - DOMAIN-SUFFIX,gdt.qpic.cn
+  - DOMAIN-SUFFIX,gdt.browser.qq.com
+  - DOMAIN-SUFFIX,gdt.tencent.com
+  - DOMAIN-SUFFIX,dsp.tencent.com
+  - DOMAIN-SUFFIX,dmp.tencent.com
+
+  # ===== 微信路径类（用 keyword）=====
+  - DOMAIN-KEYWORD,wechat
+  - DOMAIN-KEYWORD,wxad
+  - DOMAIN-KEYWORD,weixinad
+
+  # ===== 通用广告平台 =====
+  - DOMAIN-SUFFIX,googlesyndication.com
+  - DOMAIN-SUFFIX,doubleclick.net
+  - DOMAIN-SUFFIX,google-analytics.com
+  - DOMAIN-SUFFIX,googleadservices.com
+  - DOMAIN-SUFFIX,googletagmanager.com
+  - DOMAIN-SUFFIX,amazon-adsystem.com
+  - DOMAIN-SUFFIX,adsrvr.org
+  - DOMAIN-SUFFIX,adform.net
+  - DOMAIN-SUFFIX,advertising.com
+  - DOMAIN-SUFFIX,criteo.com
+  - DOMAIN-SUFFIX,openx.net
+  - DOMAIN-SUFFIX,pubmatic.com
+  - DOMAIN-SUFFIX,rubiconproject.com
+  - DOMAIN-SUFFIX,taboola.com
+  - DOMAIN-SUFFIX,outbrain.com
+  - DOMAIN-SUFFIX,smaato.net
+  - DOMAIN-SUFFIX,casalemedia.com
+  - DOMAIN-SUFFIX,adnxs.com
+  - DOMAIN-SUFFIX,turn.com
+
+  # ===== 字节 / 其他 =====
+  - DOMAIN-SUFFIX,pangolin-sdk-toutiao.com
+  - DOMAIN-SUFFIX,bytedance.com
+  - DOMAIN-SUFFIX,snssdk.com
+
+  # ===== Apple Ads =====
+  - DOMAIN-SUFFIX,iad.apple.com
+  - DOMAIN-SUFFIX,adservices.apple.com
+  - DOMAIN-SUFFIX,searchads.apple.com
+  - DOMAIN-SUFFIX,advertising.apple.com
+
+  # ===== 兜底关键词 =====
+  - DOMAIN-KEYWORD,adservice
+  - DOMAIN-KEYWORD,ads
+  - DOMAIN-KEYWORD,tracking
