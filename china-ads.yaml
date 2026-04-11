@@ -555,8 +555,7 @@ payload:
   - DOMAIN-SUFFIX,hongguo.quark.cn
   - DOMAIN-SUFFIX,hongguoshiju.com
   - DOMAIN-SUFFIX,hongguo.com
-  - DOMAIN-SUFFIX,api100-core-quic-.amemv.com
-  - DOMAIN-SUFFIX,api100-normal-quic-.amemv.com
+ 
   
   - DOMAIN-SUFFIX,lf-ad-ies.bytecdn.cn
   - DOMAIN-SUFFIX,ad-scope.com.cn
@@ -687,9 +686,9 @@ payload:
   - DOMAIN-SUFFIX,bytedan
   - DOMAIN-SUFFIX,promoter.fanqieopen.com
   - DOMAIN-SUFFIX,gateway.icloud.com
-  - DOMAIN-SUFFIX,amemv.com
+
   - DOMAIN-SUFFIX,log5-lq.qishui.com
-  - DOMAIN-SUFFIX,log5-misc-lq.amemv.com
+  
   - DOMAIN-SUFFIX,mon.toutiao.com
   - DOMAIN-SUFFIX,log.didiglobal.com
   - DOMAIN-SUFFIX,log.7mao.com
@@ -708,7 +707,6 @@ payload:
   - DOMAIN-SUFFIX,log.luna.douyin.com
   - DOMAIN-SUFFIX,monitor.luna.douyin.com
   - DOMAIN-SUFFIX,pglstatp-toutiao.com
-  - DOMAIN-SUFFIX,hongguo.heytapmobi.com
   - DOMAIN-SUFFIX,novelquickapp.com
   - DOMAIN-SUFFIX,bytegoofy.com
   - DOMAIN-SUFFIX,pstatp.com
@@ -839,7 +837,6 @@ payload:
   - DOMAIN-SUFFIX,dig.zjurl.cn
   - DOMAIN-SUFFIX,log0-applog-lf.fqnovel.com
   - DOMAIN-SUFFIX,zxid-m.mobileservice.cn
-  - DOMAIN-SUFFIX,dc-dragate-cn.heytapmobi.com
   - DOMAIN-SUFFIX,tnc3-alisc1.bytedance.com
   - DOMAIN-SUFFIX,dig.bdurl.net
   - DOMAIN-SUFFIX,yczy5.com
