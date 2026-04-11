@@ -7,10 +7,7 @@ payload:
   - DOMAIN-SUFFIX,wechat.com
   - DOMAIN-SUFFIX,api.dmp.qq.com
   - DOMAIN-SUFFIX,api.adx.qq.com
-  - DOMAIN-SUFFIX,api.ams.qq.com
   - DOMAIN-SUFFIX,ad.tencentcloudapi.com
-  - DOMAIN-SUFFIX,api.dsp.qq.com
-  - DOMAIN-SUFFIX,gdt.tencentcloudapi.com
   - DOMAIN-SUFFIX,ad.wechat.com
   - DOMAIN-SUFFIX,ad.servicewechat.com
   - DOMAIN-SUFFIX,ad.tencent-cloud.com
@@ -539,7 +536,7 @@ payload:
   - DOMAIN-SUFFIX,easytomessage.com
   - DOMAIN-SUFFIX,adx.ys7.com
   - DOMAIN-SUFFIX,admaster-public.51dow.com
-  - DOMAIN-SUFFIX,tnc3-alisc1.zijieapi.com
+  
   - DOMAIN-SUFFIX,lf-cdn-tos.bytescm.com
   - DOMAIN-SUFFIX,adashxgc.ut.taobao.com
   - DOMAIN-SUFFIX,apmplus.volces.com
@@ -560,7 +557,7 @@ payload:
   - DOMAIN-SUFFIX,hongguo.com
   - DOMAIN-SUFFIX,api100-core-quic-.amemv.com
   - DOMAIN-SUFFIX,api100-normal-quic-.amemv.com
-  - DOMAIN-SUFFIX,mon.zijieapi.com
+  
   - DOMAIN-SUFFIX,lf-ad-ies.bytecdn.cn
   - DOMAIN-SUFFIX,ad-scope.com.cn
   - DOMAIN-SUFFIX,ad-scope.com
@@ -609,12 +606,10 @@ payload:
   - DOMAIN-SUFFIX,pangolin-dsp-toutiao-b.com
   - DOMAIN-SUFFIX,pangolin-dsp-toutiao.com
   - DOMAIN-SUFFIX,ads-shopping.shouqianba.com
-  - DOMAIN-SUFFIX,log.zijieapi.com
-  - DOMAIN-SUFFIX,sf-tos-cdn.zijieapi.com
+  
   - DOMAIN-SUFFIX,oceanengine.bytedance.com
   - DOMAIN-SUFFIX,pangolin.bytedance.com
-  - DOMAIN-SUFFIX,jsb.zijieapi.com
-  - DOMAIN-SUFFIX,polaris.zijieapi.com
+ 
   - DOMAIN-SUFFIX,magev6.if.qidian.com
   - DOMAIN-SUFFIX,mage.if.qidian.com
   - DOMAIN-SUFFIX,o.if.qidian.com
@@ -858,7 +853,7 @@ payload:
   - DOMAIN-SUFFIX,gdfp.gifshow.com
   - DOMAIN-SUFFIX,sentry.io
   - DOMAIN-SUFFIX,resolve.umeng.com
-  - DOMAIN-SUFFIX,open.e.kuaishou.com
+ 
   - DOMAIN-SUFFIX,cnlogs.umengcloud.com
   - DOMAIN-SUFFIX,errnewlog.umeng.com
   - DOMAIN-SUFFIX,yumao.puata.info
