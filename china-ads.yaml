@@ -1,8 +1,10 @@
 payload:
   - DOMAIN-SUFFIX,egame.qq.com
   - DOMAIN-SUFFIX,now.qq.com
+  - DOMAIN-SUFFIX,apple.com.cn
   - DOMAIN-SUFFIX,jspcdn.cn
   - DOMAIN-SUFFIX,ams.tencentcloudapi.com
+  - DOMAIN-SUFFIX,wechat.com
   - DOMAIN-SUFFIX,api.dmp.qq.com
   - DOMAIN-SUFFIX,api.adx.qq.com
   - DOMAIN-SUFFIX,api.ams.qq.com
@@ -47,10 +49,10 @@ payload:
   - DOMAIN-SUFFIX,gdt.video.qq.com
   - DOMAIN-SUFFIX,gdt.tencentmusic.com
   - DOMAIN-SUFFIX,apd-pcdnwxstat.teg.tencent.com
+  - DOMAIN-SUFFIX,gdt.qpic.cn
   - DOMAIN-SUFFIX,pgdt.gtimg.cn
   - DOMAIN-SUFFIX,adsmind.gdtimg.com
   - DOMAIN-SUFFIX,wxad.html5.qq.com
-  - DOMAIN-SUFFIX,ad.music.qq.com
   - DOMAIN-SUFFIX,gdt.browser.qq.com
   - DOMAIN-SUFFIX,advertisement.qq.com
   - DOMAIN-SUFFIX,ad.qcloud.com
@@ -87,7 +89,6 @@ payload:
   - DOMAIN-SUFFIX,gdt.qzone.qq.com
   - DOMAIN-SUFFIX,ad.ugdtimg.com
   - DOMAIN-SUFFIX,adv.tencent.com
-  - DOMAIN-SUFFIX,googlesyndication.com
   - DOMAIN-SUFFIX,outbrain.com
   - DOMAIN-SUFFIX,rubiconproject.com
   - DOMAIN-SUFFIX,360.com
@@ -97,7 +98,6 @@ payload:
   - DOMAIN-SUFFIX,openx.net
   - DOMAIN-SUFFIX,amazon-adsystem.com
   - DOMAIN-SUFFIX,turn.com
-  - DOMAIN-SUFFIX,google-analytics.com
   - DOMAIN-SUFFIX,doubleclick.net
   - DOMAIN-SUFFIX,adsrvr.org
   - DOMAIN-SUFFIX,adform.net
@@ -112,11 +112,9 @@ payload:
   - DOMAIN-SUFFIX,casalemedia.com
   - DOMAIN-SUFFIX,adnxs.com
   - DOMAIN-SUFFIX,criteo.com
-  - DOMAIN-SUFFIX,googleadservices.com
   - DOMAIN-SUFFIX,flurry.com
   - DOMAIN-SUFFIX,ifeng.com
   - DOMAIN-SUFFIX,youku.com
-  - DOMAIN-SUFFIX,googletagmanager.com
   - DOMAIN-SUFFIX,adcomeon.com
   - DOMAIN-SUFFIX,miaozhen.cn
   - DOMAIN-SUFFIX,gdtadx.com
@@ -131,19 +129,18 @@ payload:
   - DOMAIN-SUFFIX,mrlin.vip
   - DOMAIN-SUFFIX,wxs.qq.com
   - DOMAIN-SUFFIX,tc.qq.com
-  - DOMAIN-SUFFIX,api.*
-  - DOMAIN-KEYWORD,xpgios
   - DOMAIN-SUFFIX,ad.zhihu.com
   - DOMAIN-SUFFIX,xg.zhihu.com
   - DOMAIN-SUFFIX,spider.zhihu.com
   - DOMAIN-SUFFIX,event.zhihu.com
   - DOMAIN-SUFFIX,uv.zhihu.com
   - DOMAIN-SUFFIX,gslb.livehwc3.cn
+  - DOMAIN-SUFFIX,d.meituan.net
   - DOMAIN-SUFFIX,vod2.myqcloud.com
   - DOMAIN-SUFFIX,hxx2023.cc
   - DOMAIN-SUFFIX,e.qq.com
   - DOMAIN-SUFFIX,https:
-  - DOMAIN-SUFFIX,adcdn.*
+  - DOMAIN-KEYWORD,adcdn
   - DOMAIN-SUFFIX,gtimg.com
   - DOMAIN-SUFFIX,weixin.qq.com
   - DOMAIN-SUFFIX,tencentad.cn
@@ -161,7 +158,6 @@ payload:
   - DOMAIN-SUFFIX,adcdn.apple.com
   - DOMAIN-SUFFIX,searchads.apple.com
   - DOMAIN-SUFFIX,advertising.apple.com
-  - DOMAIN-KEYWORD,analyticsevents
   - DOMAIN-SUFFIX,kdniao.com
   - DOMAIN-SUFFIX,17track.net
   - DOMAIN-SUFFIX,koudaitong.com
@@ -243,6 +239,7 @@ payload:
   - DOMAIN-SUFFIX,dashuh5.com
   - DOMAIN-SUFFIX,shejibang.com
   - DOMAIN-SUFFIX,qingk.com
+  - DOMAIN-SUFFIX,socialbook.com.cn
   - DOMAIN-SUFFIX,heybox.com
   - DOMAIN-SUFFIX,96weixin.com
   - DOMAIN-SUFFIX,weqia.com
@@ -401,18 +398,16 @@ payload:
   - DOMAIN-SUFFIX,stzb.com.cn
   - DOMAIN-SUFFIX,signal.xm.test.sankuai.com
   - DOMAIN-SUFFIX,msstest.sankuai.com
+  - DOMAIN-SUFFIX,prism-report-custom.dreport.meituan.net
   - DOMAIN-SUFFIX,lf-leads-fe-scm.bytecdn.com
-  - DOMAIN-SUFFIX,ad-*
   - DOMAIN-SUFFIX,tencentmusic.com
   - DOMAIN-SUFFIX,bdianmusic.com
   - DOMAIN-SUFFIX,gz.qrkjwl.com
   - DOMAIN-SUFFIX,res.hduofen.cn
-  - DOMAIN-SUFFIX,ads.*
-  - DOMAIN-SUFFIX,ad.*
   - DOMAIN-SUFFIX,qqimg.com
   - DOMAIN-SUFFIX,gdtimg.com
   - DOMAIN-SUFFIX,pub.idqqimg.com
-  - DOMAIN-SUFFIX,mmbiz.qlogo.cn
+  - DOMAIN-SUFFIX,qpic.cn
   - DOMAIN-SUFFIX,qyaninfo.com
   - DOMAIN-SUFFIX,9game.cn
   - DOMAIN-SUFFIX,layaair.com
@@ -466,10 +461,7 @@ payload:
   - DOMAIN-SUFFIX,openx.com
   - DOMAIN-SUFFIX,indexexchange.com
   - DOMAIN-SUFFIX,smaato.com
-  - DOMAIN-KEYWORD,analytics
-  - DOMAIN-KEYWORD,tracking
   - DOMAIN-SUFFIX,analytics.zhugeio.com
-  - DOMAIN-KEYWORD,promotion
   - DOMAIN-KEYWORD,marketing
   - DOMAIN-SUFFIX,promotion.wjx.cn
   - DOMAIN-SUFFIX,baiduad.com
@@ -491,10 +483,13 @@ payload:
   - DOMAIN-SUFFIX,mbmodule-openapi.paas.cmbchina.com
   - DOMAIN-SUFFIX,creditcardapp.bankcomm.com
   - DOMAIN-SUFFIX,m.ctrip.com
+  - DOMAIN-SUFFIX,rms.meituan.com
   - DOMAIN-SUFFIX,vod-movie.maoyan.com
   - DOMAIN-SUFFIX,wx.maoyan.com
+  - DOMAIN-SUFFIX,npay.meituan.com
   - DOMAIN-SUFFIX,mkt-gateway.tuhu.cn
   - DOMAIN-SUFFIX,wx.17u.cn
+  - DOMAIN-SUFFIX,web.meituan.com
   - DOMAIN-SUFFIX,tbgapplet.carlsberg.asia
   - DOMAIN-SUFFIX,saas-ad.cloudpnr.com
   - DOMAIN-SUFFIX,mcsp.cloudpnr.com
@@ -509,7 +504,6 @@ payload:
   - DOMAIN-SUFFIX,wx.bthhotels.com
   - DOMAIN-SUFFIX,app.homeinns.com
   - DOMAIN-SUFFIX,wxapp.bestwehotel.com
-  - DOMAIN-SUFFIX,api-*
   - DOMAIN-SUFFIX,minipro.95504.net
   - DOMAIN-SUFFIX,app.95504.net
   - DOMAIN-SUFFIX,webchatapp.fcbox.com
@@ -575,10 +569,8 @@ payload:
   - DOMAIN-SUFFIX,iads.unity3d.com
   - DOMAIN-SUFFIX,adsmoloco.com
   - DOMAIN-SUFFIX,tencentad.com
-  - DOMAIN-KEYWORD,union
+  - DOMAIN-SUFFIX,servicewechat.com
   - DOMAIN-SUFFIX,alimama.com
-  - DOMAIN-SUFFIX,sdk-*
-  - DOMAIN-SUFFIX,sdk.*
   - DOMAIN-SUFFIX,appconfigloader.ptengine.cn
   - DOMAIN-SUFFIX,mp.ptengine.cn
   - DOMAIN-SUFFIX,matrix.wosai.cn
@@ -591,7 +583,7 @@ payload:
   - DOMAIN-SUFFIX,lf-cdn-tos.bytescm.com
   - DOMAIN-SUFFIX,adashxgc.ut.taobao.com
   - DOMAIN-SUFFIX,apmplus.volces.com
-  - DOMAIN-KEYWORD,ploutoappsource
+  - DOMAIN-KEYWORD,plouto-appsource
   - DOMAIN-SUFFIX,tp-pay.snssdk.com
   - DOMAIN-SUFFIX,log.snssdk.com
   - DOMAIN-SUFFIX,dm.snssdk.com
@@ -612,8 +604,7 @@ payload:
   - DOMAIN-SUFFIX,lf-ad-ies.bytecdn.cn
   - DOMAIN-SUFFIX,ad-scope.com.cn
   - DOMAIN-SUFFIX,ad-scope.com
-  - DOMAIN-KEYWORD,vweb
-  - DOMAIN-KEYWORD,sign
+  - DOMAIN-SUFFIX,novel-market.fqnovel.com
   - DOMAIN-SUFFIX,push-rtmp-l9-cny.douyincdn.com
   - DOMAIN-SUFFIX,push-rtmp-l6-cny.douyincdn.com
   - DOMAIN-SUFFIX,push-rtmp-l3-cny.douyincdn.com
@@ -646,13 +637,12 @@ payload:
   - DOMAIN-SUFFIX,v3.douyincdn.com
   - DOMAIN-SUFFIX,v1.douyincdn.com
   - DOMAIN-SUFFIX,ad-sign.toutiao.com
+  - DOMAIN-SUFFIX,license.fqnovelvod.com
   - DOMAIN-SUFFIX,p9.douyinpic.com
   - DOMAIN-SUFFIX,p3.douyinpic.com
   - DOMAIN-SUFFIX,p26.douyinpic.com
   - DOMAIN-SUFFIX,pglstatp-toutiao-b.com
   - DOMAIN-SUFFIX,pglstatp-snssdk-toutiao.com
-  - DOMAIN-KEYWORD,pbepacksign
-  - DOMAIN-KEYWORD,vbepack
   - DOMAIN-SUFFIX,p9-tos.pstatp.com
   - DOMAIN-SUFFIX,p3-tos.pstatp.com
   - DOMAIN-SUFFIX,sf3-tos.pstatp.com
@@ -662,12 +652,9 @@ payload:
   - DOMAIN-SUFFIX,log.zijieapi.com
   - DOMAIN-SUFFIX,sf-tos-cdn.zijieapi.com
   - DOMAIN-SUFFIX,oceanengine.bytedance.com
-  - DOMAIN-KEYWORD,pglstatptoutiao
   - DOMAIN-SUFFIX,pangolin.bytedance.com
   - DOMAIN-SUFFIX,jsb.zijieapi.com
-  - DOMAIN-KEYWORD,tncbjlgy
   - DOMAIN-SUFFIX,polaris.zijieapi.com
-  - DOMAIN-KEYWORD,sffetos
   - DOMAIN-SUFFIX,magev6.if.qidian.com
   - DOMAIN-SUFFIX,mage.if.qidian.com
   - DOMAIN-SUFFIX,o.if.qidian.com
@@ -675,7 +662,6 @@ payload:
   - DOMAIN-SUFFIX,activity.qidian.com
   - DOMAIN-SUFFIX,taojin.qidian.com
   - DOMAIN-SUFFIX,pingba.qidian.com
-  - DOMAIN-KEYWORD,ttam
   - DOMAIN-SUFFIX,log5-hl.qishui.com
   - DOMAIN-SUFFIX,tencent-analytics.com
   - DOMAIN-SUFFIX,trace.kuaishou.com
@@ -705,7 +691,9 @@ payload:
   - DOMAIN-SUFFIX,alilog.com
   - DOMAIN-SUFFIX,log.aliyuncs.com
   - DOMAIN-SUFFIX,shuqian.taobao.com
+  - DOMAIN-SUFFIX,stat.amap.com
   - DOMAIN-SUFFIX,bytedns.com
+  - DOMAIN-SUFFIX,volceapplog.com
   - DOMAIN-SUFFIX,tencentads.com
   - DOMAIN-SUFFIX,ibytedapm.com
   - DOMAIN-SUFFIX,isnssdk.com
@@ -713,10 +701,18 @@ payload:
   - DOMAIN-SUFFIX,stat.kuaishou.com
   - DOMAIN-SUFFIX,tanx.com
   - DOMAIN-SUFFIX,yunosad.com
-  - DOMAIN-KEYWORD,readingvideo
+  - DOMAIN-SUFFIX,frontier100-toutiao-lf.fqnovel.com
+  - DOMAIN-SUFFIX,novelapp.fqnovelvod.com
+  - DOMAIN-KEYWORD,reading-video
+  - DOMAIN-SUFFIX,mon11-misc-lq.fqnovel.com
+  - DOMAIN-SUFFIX,mon5-misc-lq.fqnovel.com
+  - DOMAIN-SUFFIX,mon3-misc-lq.fqnovel.com
   - DOMAIN-SUFFIX,lf-reward-video.bytedcdn.com
   - DOMAIN-SUFFIX,activity-ag.awemeughun.com
-  - DOMAIN-SUFFIX,google.com
+  - DOMAIN-SUFFIX,rtlog5-applog-hl.fqnovel.com
+  - DOMAIN-SUFFIX,rtlog3-applog-hl.fqnovel.com
+  - DOMAIN-SUFFIX,mon3-misc-hl.fqnovel.com
+  - DOMAIN-SUFFIX,mon11-misc-hl.fqnovel.com
   - DOMAIN-SUFFIX,setup.icloud.com
   - DOMAIN-SUFFIX,p-ad-static.pstatp.com
   - DOMAIN-SUFFIX,ad-static.pstatp.com
@@ -724,11 +720,13 @@ payload:
   - DOMAIN-SUFFIX,splash.pstatp.com
   - DOMAIN-SUFFIX,short-drama-cdn.byteimg.com
   - DOMAIN-SUFFIX,dramad.volccdn.com
+  - DOMAIN-SUFFIX,applog.volccdn.com
   - DOMAIN-SUFFIX,utrack.volcengine.com
   - DOMAIN-SUFFIX,mon.volcengine.com
   - DOMAIN-SUFFIX,sf3-ttcdn-tos.pstatp.com
   - DOMAIN-SUFFIX,ugdtc.com
   - DOMAIN-SUFFIX,ugdtimg.com
+  - DOMAIN-SUFFIX,douyinliving.com
   - DOMAIN-SUFFIX,ugsdk
   - DOMAIN-SUFFIX,mssdk.byte-dance.com
   - DOMAIN-SUFFIX,bytedan
@@ -746,10 +744,12 @@ payload:
   - DOMAIN-SUFFIX,splash.qishui.com
   - DOMAIN-SUFFIX,mon.qishui.com
   - DOMAIN-SUFFIX,splash.soda-music.com
+  - DOMAIN-SUFFIX,applog.bytedance.com
   - DOMAIN-SUFFIX,utdid.alibaba.com
   - DOMAIN-SUFFIX,lf3-ttcdn-tos.pstatp.com
   - DOMAIN-SUFFIX,lf6-ttcdn-tos.pstatp.com
   - DOMAIN-SUFFIX,log.soda-music.com
+  - DOMAIN-SUFFIX,applog.fqnovel.com
   - DOMAIN-SUFFIX,log.luna.douyin.com
   - DOMAIN-SUFFIX,monitor.luna.douyin.com
   - DOMAIN-SUFFIX,pglstatp-toutiao.com
@@ -757,68 +757,52 @@ payload:
   - DOMAIN-SUFFIX,novelquickapp.com
   - DOMAIN-SUFFIX,bytegoofy.com
   - DOMAIN-SUFFIX,pstatp.com
-  - DOMAIN-SUFFIX,gtimg.*
-  - DOMAIN-SUFFIX,gdtimg.*
+  - DOMAIN-SUFFIX,meituan.net
+  - DOMAIN-SUFFIX,meituan.com
+  - DOMAIN-KEYWORD,gtimg
+  - DOMAIN-KEYWORD,gdtimg
   - DOMAIN-SUFFIX,gw.alicdn.com
   - DOMAIN-SUFFIX,storage.jd.com
   - DOMAIN-SUFFIX,log-upload.mob.com
   - DOMAIN-SUFFIX,tencent.com
-  - DOMAIN-KEYWORD,dmgd
   - DOMAIN-SUFFIX,jju31.top
-  - DOMAIN-KEYWORD,6388
-  - DOMAIN-KEYWORD,1fmgdeveloper
+  - DOMAIN-SUFFIX,ixigua.com
   - DOMAIN-SUFFIX,jinritemai.com
   - DOMAIN-SUFFIX,csjplatform.com
-  - DOMAIN-KEYWORD,goodsimg
+  - DOMAIN-KEYWORD,fqnovel
+  - DOMAIN-SUFFIX,ip-goods-img.fqnovelpic.com
   - DOMAIN-SUFFIX,novel-market.bytedance.com
-  - DOMAIN-KEYWORD,goods
-  - DOMAIN-KEYWORD,track
+  - DOMAIN-SUFFIX,activity-h5.fqnovel.com
+  - DOMAIN-SUFFIX,novel-mall.fqnovel.com
+  - DOMAIN-SUFFIX,ip-goods.fqnovel.com
   - DOMAIN-SUFFIX,img-nos.yiyouliao.com
   - DOMAIN-SUFFIX,51y5.net
+  - DOMAIN-SUFFIX,wap.cmpassport.com
   - DOMAIN-SUFFIX,report.jmedium.cn
   - DOMAIN-SUFFIX,rcv.aishuttler.com
   - DOMAIN-SUFFIX,di.aishuttler.com
   - DOMAIN-SUFFIX,t.microengine.cn
-  - DOMAIN-SUFFIX,douyincdn.*
-  - DOMAIN-SUFFIX,pangle.*
-  - DOMAIN-KEYWORD,adserver
-  - DOMAIN-KEYWORD,advert
+  - DOMAIN-SUFFIX,s3plus.meituan.net
+  - DOMAIN-SUFFIX,pull-f5-xg.flive.ixigua.com
+  - DOMAIN-KEYWORD,douyincdn
+  - DOMAIN-KEYWORD,pangle
   - DOMAIN-SUFFIX,ecombdimg.com
-  - DOMAIN-KEYWORD,lfwebcastcdntosncdn
-  - DOMAIN-KEYWORD,sinfonlinec
-  - DOMAIN-KEYWORD,ttweb
-  - DOMAIN-KEYWORD,erer
-  - DOMAIN-KEYWORD,pstatp
-  - DOMAIN-KEYWORD,siomxity
-  - DOMAIN-KEYWORD,stream
-  - DOMAIN-KEYWORD,ietheivaicai
-  - DOMAIN-KEYWORD,0kkkkkt
-  - DOMAIN-KEYWORD,ecombd
-  - DOMAIN-KEYWORD,misc
-  - DOMAIN-KEYWORD,bsgslb
-  - DOMAIN-KEYWORD,toutiao
-  - DOMAIN-KEYWORD,sealaly
-  - DOMAIN-KEYWORD,static
-  - DOMAIN-SUFFIX,pglstatp-*
-  - DOMAIN-SUFFIX,frontier-toutiao.*
+  - DOMAIN-SUFFIX,lf3-reading.fqnovelpic.com
+  - DOMAIN-KEYWORD,frontier-toutiao
   - DOMAIN-SUFFIX,monsetting.toutiao.com
   - DOMAIN-SUFFIX,mssdk.bytedance.com
   - DOMAIN-SUFFIX,api7.tuisong.baidu.com
   - DOMAIN-SUFFIX,gateway.icloud.com.cn
-  - DOMAIN-KEYWORD,splashad
-  - DOMAIN-SUFFIX,ad.*.douyin.*
-  - DOMAIN-SUFFIX,ad.*.toutiao.*
-  - DOMAIN-KEYWORD,?promo=
-  - DOMAIN-KEYWORD,?campaign=
-  - DOMAIN-SUFFIX,oceanengine.*
+  - DOMAIN-KEYWORD,douyin
+  - DOMAIN-KEYWORD,toutiao
+  - DOMAIN-KEYWORD,oceanengine
   - DOMAIN-SUFFIX,tr.byteurl.cn
   - DOMAIN-SUFFIX,lf-normal-gr-sourcecdn.bytegecko.com
   - DOMAIN-SUFFIX,track.ecommerce.com
   - DOMAIN-SUFFIX,ecombdapi.com
   - DOMAIN-SUFFIX,douyinpic.com
-  - DOMAIN-SUFFIX,ads.toutiao.*
-  - DOMAIN-SUFFIX,duanju.*
-  - DOMAIN-SUFFIX,hongguo.*
+  - DOMAIN-KEYWORD,duanju
+  - DOMAIN-KEYWORD,hongguo
   - DOMAIN-SUFFIX,log.bytedance.com
   - DOMAIN-SUFFIX,monitor.bytedance.com
   - DOMAIN-SUFFIX,analytics.toutiao.com
@@ -882,7 +866,6 @@ payload:
   - DOMAIN-SUFFIX,lf3-cdn-tos.bytecdntp.com
   - DOMAIN-SUFFIX,lf6-cdn-tos.bytecdntp.com
   - DOMAIN-SUFFIX,scorecardresearch.com
-  - DOMAIN-SUFFIX,analytics.google.com
   - DOMAIN-SUFFIX,adcolony.com
   - DOMAIN-SUFFIX,chartboost.com
   - DOMAIN-SUFFIX,ironsrc.com
@@ -892,10 +875,15 @@ payload:
   - DOMAIN-SUFFIX,googleads.g.doubleclick.net
   - DOMAIN-SUFFIX,ac.dun.163.com
   - DOMAIN-SUFFIX,t-dsp.pinduoduo.com
+  - DOMAIN-SUFFIX,klink.volceapplog.com
+  - DOMAIN-SUFFIX,log-auth.zztfly.com
   - DOMAIN-SUFFIX,fp-it.fengkongcloud.com
   - DOMAIN-SUFFIX,tk.anythinktech.com
+  - DOMAIN-SUFFIX,log0-applog-lq.fqnovel.com
+  - DOMAIN-SUFFIX,rtlog5-applog-lq.fqnovel.com
   - DOMAIN-SUFFIX,open.e.kuaishou.cn
   - DOMAIN-SUFFIX,dig.zjurl.cn
+  - DOMAIN-SUFFIX,log0-applog-lf.fqnovel.com
   - DOMAIN-SUFFIX,zxid-m.mobileservice.cn
   - DOMAIN-SUFFIX,dc-dragate-cn.heytapmobi.com
   - DOMAIN-SUFFIX,tnc3-alisc1.bytedance.com
