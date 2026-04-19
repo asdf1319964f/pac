@@ -1,0 +1,58 @@
+# ToMoon 订阅:单 SOCKS5 节点 + 全局模式
+# 用法:把下面 __HOST__ / __PORT__ 改成你的 SOCKS5 服务器 IP 和端口
+# 需要认证时取消 username / password 两行的注释并填值
+# 托管方式:GitHub Gist raw / 自建 HTTP / 云盘直链,URL 粘进 ToMoon 订阅栏即可
+
+mixed-port: 7890
+allow-lan: true
+bind-address: "*"
+mode: global
+log-level: info
+ipv6: false
+external-controller: 127.0.0.1:9090
+
+dns:
+  enable: true
+  listen: 0.0.0.0:53
+  ipv6: false
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - "*.lan"
+    - "localhost.ptlogin2.qq.com"
+    - "+.srv.nintendo.net"
+    - "+.stun.playstation.net"
+    - "xbox.*.microsoft.com"
+    - "*.xboxlive.com"
+  nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+  fallback:
+    - tls://1.1.1.1:853
+    - tls://8.8.8.8:853
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+
+proxies:
+  - name: "SOCKS5"
+    type: socks5
+    server: 10.215.196.105
+    port: 7892
+    # username: __USER__
+    # password: __PASS__
+    udp: true
+    tls: false
+    skip-cert-verify: true
+
+proxy-groups:
+  - name: "PROXY"
+    type: select
+    proxies:
+      - SOCKS5
+
+rules:
+  - MATCH,PROXY
