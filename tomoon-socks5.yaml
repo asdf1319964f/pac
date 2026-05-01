@@ -40,7 +40,7 @@ dns:
 proxies:
   - name: "SOCKS5"
     type: socks5
-    server: 10.65.141.203
+    server: 10.212.27.240
     port: 7892
     # username: __USER__
     # password: __PASS__
