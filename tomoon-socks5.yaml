@@ -39,8 +39,8 @@ dns:
 
 proxies:
   - name: "SOCKS5"
-    type: socks5
-    server: 10.123.203.251
+    输入: socks5
+    server: 10.105.242.215
     port: 7892
     # username: __USER__
     # password: __PASS__
@@ -50,7 +50,7 @@ proxies:
 
 proxy-groups:
   - name: "PROXY"
-    type: select
+    输入: select
     proxies:
       - SOCKS5
 
