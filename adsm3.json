@@ -64,7 +64,7 @@
 		],
 		"name": "全局合并去广告",
 		"regex": [
-			"#EXTINF.*?\\s+.*?(VmnacVi|Qqczg6ZH|XHEmIeRc|8l7mQnsg|X7WdqELx|z4m9gXoW|JGeGJOB9|ISz1P4sP|07dlJWU1|HUQlmVy9|xjand|KWZehyir|n5f8B8Mn|cf1g6f|cRuclysU|PymmgUpX|VmnacVi8|2dLBhtbi|Bkg9vnI9|C7SzdYQ8|m2Z4t6Ik|oLIZXGpG|0JwQByr9|a3MjBupd|5f4gbg|kXD5sRw4|6KXojEay).*?\\.(ts|jpg|png)",
+			"#EXTINF.*?\\s+.*?(VmnacVi|Qqczg6ZH|XHEmIeRc|dm2gifki|8l7mQnsg|X7WdqELx|z4m9gXoW|JGeGJOB9|ISz1P4sP|07dlJWU1|HUQlmVy9|xjand|KWZehyir|n5f8B8Mn|cf1g6f|cRuclysU|PymmgUpX|VmnacVi8|2dLBhtbi|Bkg9vnI9|C7SzdYQ8|m2Z4t6Ik|oLIZXGpG|0JwQByr9|a3MjBupd|5f4gbg|kXD5sRw4|6KXojEay).*?\\.(ts|jpg|png)",
 			"#EXTINF.*?\\s+.*?1o.*?\\.(ts|jpg|png)\\s+"
 		]
 	}
